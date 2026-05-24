@@ -1,0 +1,10 @@
+{
+  "name": "greg-ai-projects-page",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --test test/site.test.mjs",
+    "serve": "python3 -m http.server 4173"
+  }
+}

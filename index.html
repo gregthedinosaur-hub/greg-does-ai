@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Greg Does AI | Figuring It Out in Public</title>
+    <meta
+      name="description"
+      content="Greg Does AI: a minimalist index of Greg Kitchen's practical AI experiments, built while figuring out code, AI, and what useful systems can become."
+    />
+    <meta name="theme-color" content="#F5F8FF" />
+    <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,650;9..40,700&family=JetBrains+Mono:wght@500;600&family=Playfair+Display:wght@600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+    <script src="script.js" defer></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+
+    <header class="site-header">
+      <a class="wordmark" href="#main" aria-label="Greg Does AI home">
+        <span class="wordmark__mark">GK</span>
+        <span class="wordmark__text">Greg Does AI</span>
+      </a>
+      <nav class="site-nav" aria-label="Primary navigation">
+        <a href="#projects">Projects</a>
+        <a href="#about">About</a>
+      </nav>
+    </header>
+
+    <main id="main">
+      <section class="hero" aria-labelledby="hero-title">
+        <div class="hero__copy">
+          <h1 id="hero-title" class="hero-title">Greg Does AI</h1>
+          <p class="hero__lede">
+            Learning the machinery while everyone else is still reading the
+            memo.
+          </p>
+          <p class="hero__body">
+            Practical AI experiments for sensing signals, testing simulations,
+            and making ambiguity easier to use.
+          </p>
+          <dl class="hero-stats" aria-label="Portfolio stats">
+            <div>
+              <dt>Projects</dt>
+              <dd>4</dd>
+            </div>
+            <div>
+              <dt>Live build</dt>
+              <dd>1</dd>
+            </div>
+            <div>
+              <dt>Mode</dt>
+              <dd>Sandbox</dd>
+            </div>
+          </dl>
+          <div class="hero__actions" aria-label="Page shortcuts">
+            <a class="button button--primary" href="#projects">View projects</a>
+            <a class="button button--secondary" href="#about">Read bio</a>
+          </div>
+        </div>
+
+        <figure class="hero-portrait">
+          <img
+            src="assets/greg-kitchen-bio.png"
+            alt="Portrait of Greg Kitchen"
+            width="242"
+            height="358"
+          />
+        </figure>
+      </section>
+
+      <section class="projects section" id="projects" aria-labelledby="projects-title">
+        <div class="section-heading">
+          <h2 id="projects-title">Selected AI projects</h2>
+          <p>
+            High-level notes on active work, kept intentionally concise until
+            each project is ready for a deeper public write-up.
+          </p>
+        </div>
+
+        <div class="project-browser">
+          <div
+            class="project-tabs"
+            id="project-tabs"
+            role="tablist"
+            aria-label="AI project list"
+          ></div>
+          <article
+            class="project-detail"
+            id="project-detail"
+            role="tabpanel"
+            aria-live="polite"
+          ></article>
+        </div>
+      </section>
+
+      <section class="about section" id="about" aria-labelledby="about-title">
+        <figure class="bio-media">
+          <div class="bio-media__stack">
+            <img
+              class="bio-media__portrait"
+              src="assets/greg-kitchen-bio.png"
+              alt="Portrait of Greg Kitchen"
+              width="242"
+              height="358"
+            />
+            <img
+              class="bio-media__ai"
+              src="assets/greg-kitchen-ai-humanoid.png"
+              alt=""
+              width="484"
+              height="716"
+              aria-hidden="true"
+            />
+          </div>
+        </figure>
+
+        <div class="bio-copy">
+          <h2 id="about-title">About Greg</h2>
+          <p>
+            Greg Kitchen builds practical AI systems that make complex signals
+            easier to understand and act on. His work sits at the intersection
+            of strategy, market sensing, product thinking, and rapid
+            prototyping.
+          </p>
+          <p>
+            The through line is translation: turning ambiguity into structure,
+            structure into tools, and tools into clearer decisions for people
+            doing consequential work.
+          </p>
+
+          <dl class="bio-principles" aria-label="Working principles">
+            <div>
+              <dt>Clear signal</dt>
+              <dd>Find what matters without adding noise.</dd>
+            </div>
+            <div>
+              <dt>Human judgment</dt>
+              <dd>Use AI to sharpen decisions, not replace context.</dd>
+            </div>
+            <div>
+              <dt>Useful loops</dt>
+              <dd>Favor systems that can be tested, improved, and reused.</dd>
+            </div>
+          </dl>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <p>
+        A living index for AI work in progress. More projects will be added as
+        they become ready to share.
+      </p>
+    </footer>
+  </body>
+</html>

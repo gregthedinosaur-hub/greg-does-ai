@@ -1,0 +1,2644 @@
+<!doctype html>
+<!--
+  AI Mini-MBA — An Interactive Course
+  Built for a transformation-team leader in life & annuity:
+  partnerships + BPO lead, standing up an innovation function.
+  Self-contained: HTML + CSS + vanilla JS. Progress persists via a layered
+  store: window.storage in the Claude viewer, localStorage as a standalone file.
+-->
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AI Mini-MBA — Interactive Course</title>
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,400&family=Hanken+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+  :root{
+    --paper:#ECE4D3;
+    --paper-2:#F4EEE0;
+    --paper-3:#F9F5EB;
+    --ink:#221E18;
+    --ink-2:#2C2820;
+    --ink-soft:#534B3D;
+    --ink-faint:#8B8270;
+    --line:#D6CBB1;
+    --line-soft:#E2D9C3;
+    --rust:#B8472A;
+    --rust-deep:#8E3520;
+    --forest:#2E4639;
+    --gold:#BE912E;
+    --correct:#2F6B4D;
+    --correct-bg:#E3EADD;
+    --wrong:#AE3A2C;
+    --wrong-bg:#F0DFD8;
+    --shadow:0 1px 0 rgba(0,0,0,.04), 0 18px 40px -22px rgba(34,30,24,.45);
+    --radius:14px;
+  }
+
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{
+    font-family:'Hanken Grotesk',-apple-system,sans-serif;
+    background:var(--paper);
+    color:var(--ink);
+    -webkit-font-smoothing:antialiased;
+    line-height:1.6;
+    overflow:hidden;
+  }
+  /* paper grain */
+  body::before{
+    content:"";position:fixed;inset:0;pointer-events:none;z-index:9999;
+    opacity:.5;mix-blend-mode:multiply;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
+  }
+
+  button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit}
+  ::selection{background:var(--rust);color:var(--paper-3)}
+
+  /* ---------- shell ---------- */
+  .app{display:flex;height:100vh;width:100vw}
+
+  /* ---------- sidebar ---------- */
+  .sidebar{
+    width:312px;flex-shrink:0;height:100%;
+    background:var(--ink);color:var(--paper);
+    display:flex;flex-direction:column;
+    border-right:1px solid #000;
+    position:relative;
+  }
+  .sb-head{padding:30px 28px 22px}
+  .sb-kicker{
+    font-size:12.3px;letter-spacing:.28em;text-transform:uppercase;
+    color:var(--gold);font-weight:600;margin-bottom:10px;
+  }
+  .sb-title{
+    font-family:'Fraunces',serif;font-weight:600;
+    font-size:29.3px;line-height:1.12;letter-spacing:-.01em;
+    color:var(--paper-3);
+  }
+  .sb-title em{font-style:italic;color:var(--gold)}
+  .sb-progress-wrap{padding:0 28px 20px}
+  .sb-progress-meta{
+    display:flex;justify-content:space-between;align-items:baseline;
+    font-size:13.5px;color:var(--ink-faint);margin-bottom:8px;
+    letter-spacing:.02em;
+  }
+  .sb-progress-meta strong{color:var(--paper-3);font-weight:600;font-size:14.6px}
+  .sb-bar{height:5px;background:#3a342a;border-radius:99px;overflow:hidden}
+  .sb-bar i{
+    display:block;height:100%;width:0%;
+    background:linear-gradient(90deg,var(--rust),var(--gold));
+    border-radius:99px;transition:width .5s cubic-bezier(.4,0,.2,1);
+  }
+
+  .sb-nav{flex:1;overflow-y:auto;padding:6px 14px 24px}
+  .sb-nav::-webkit-scrollbar{width:8px}
+  .sb-nav::-webkit-scrollbar-thumb{background:#3a342a;border-radius:99px}
+  .sb-section-label{
+    font-size:11.7px;letter-spacing:.2em;text-transform:uppercase;
+    color:var(--ink-faint);font-weight:600;
+    padding:16px 14px 8px;
+  }
+
+  .navitem{
+    width:100%;text-align:left;display:flex;align-items:flex-start;gap:12px;
+    padding:10px 14px;border-radius:9px;color:var(--paper);
+    transition:background .16s ease;position:relative;
+  }
+  .navitem:hover{background:#2e2920}
+  .navitem.active{background:#322c22}
+  .navitem.active::before{
+    content:"";position:absolute;left:0;top:8px;bottom:8px;width:3px;
+    background:var(--rust);border-radius:99px;
+  }
+  .navitem.locked{opacity:.42;cursor:default}
+  .navitem.locked:hover{background:none}
+  .ni-dot{
+    flex-shrink:0;width:21px;height:21px;border-radius:50%;
+    border:1.5px solid #4a4336;display:grid;place-items:center;
+    font-size:12.3px;font-weight:700;color:var(--ink-faint);margin-top:1px;
+    transition:all .2s ease;
+  }
+  .navitem.active .ni-dot{border-color:var(--rust);color:var(--paper-3)}
+  .ni-dot.done{background:var(--rust);border-color:var(--rust);color:var(--paper-3)}
+  .ni-dot.done::after{content:"\2713";font-size:12.9px}
+  .ni-dot.done span{display:none}
+  .ni-text{flex:1;min-width:0}
+  .ni-name{font-size:15.8px;font-weight:500;line-height:1.32;color:var(--paper-3)}
+  .navitem.locked .ni-name,.navitem:not(.active):not(.locked) .ni-name{color:#cfc6b3}
+  .ni-sub{font-size:12.9px;color:var(--ink-faint);margin-top:2px;letter-spacing:.01em}
+
+  .sb-foot{
+    padding:14px 22px;border-top:1px solid #322c22;
+    display:flex;justify-content:space-between;align-items:center;
+  }
+  .sb-foot button{
+    font-size:12.9px;color:var(--ink-faint);letter-spacing:.04em;
+    display:flex;align-items:center;gap:6px;transition:color .15s;
+  }
+  .sb-foot button:hover{color:var(--rust)}
+
+  /* ---------- main ---------- */
+  .main{flex:1;height:100%;overflow-y:auto;position:relative}
+  .main::-webkit-scrollbar{width:11px}
+  .main::-webkit-scrollbar-track{background:var(--paper)}
+  .main::-webkit-scrollbar-thumb{background:var(--line);border-radius:99px;border:3px solid var(--paper)}
+  .stage{max-width:780px;margin:0 auto;padding:62px 56px 120px;animation:rise .45s cubic-bezier(.2,.7,.2,1)}
+  @keyframes rise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+
+  /* ---------- overview ---------- */
+  .ov-kicker{
+    font-size:12.9px;letter-spacing:.3em;text-transform:uppercase;
+    color:var(--rust);font-weight:600;margin-bottom:18px;
+  }
+  .ov-title{
+    font-family:'Fraunces',serif;font-weight:600;
+    font-size:clamp(44.5px,5vw,65.5px);line-height:1.02;letter-spacing:-.025em;
+    margin-bottom:22px;
+  }
+  .ov-title em{font-style:italic;color:var(--rust)}
+  .ov-lede{
+    font-size:21.6px;color:var(--ink-soft);max-width:600px;
+    line-height:1.62;margin-bottom:14px;
+  }
+  .ov-lede.small{font-size:18.7px;margin-bottom:34px}
+  .ov-rule{height:1px;background:var(--line);margin:38px 0}
+  .ov-h{
+    font-family:'Fraunces',serif;font-size:16.4px;font-weight:600;
+    letter-spacing:.02em;text-transform:uppercase;color:var(--ink-faint);
+    margin-bottom:20px;
+  }
+  .ov-grid{display:grid;gap:2px;background:var(--line-soft);border:1px solid var(--line-soft);border-radius:var(--radius);overflow:hidden}
+  .ov-card{
+    background:var(--paper-2);padding:20px 22px;display:flex;gap:18px;
+    align-items:flex-start;transition:background .18s ease;text-align:left;width:100%;
+  }
+  .ov-card:hover{background:var(--paper-3)}
+  .ov-num{
+    font-family:'Fraunces',serif;font-size:35.1px;font-weight:500;
+    color:var(--rust);line-height:1;flex-shrink:0;width:46px;
+    font-variant-numeric:lining-nums;
+  }
+  .ov-cbody{flex:1}
+  .ov-cname{font-size:18.7px;font-weight:600;margin-bottom:3px}
+  .ov-cdesc{font-size:15.8px;color:var(--ink-soft);line-height:1.5}
+  .ov-cmeta{
+    flex-shrink:0;display:flex;flex-direction:column;align-items:flex-end;
+    gap:6px;padding-top:3px;
+  }
+  .ov-pill{
+    font-size:12.3px;font-weight:600;letter-spacing:.04em;
+    padding:3px 9px;border-radius:99px;text-transform:uppercase;
+  }
+  .ov-pill.done{background:var(--correct-bg);color:var(--correct)}
+  .ov-pill.todo{background:#e7ddc6;color:var(--ink-faint)}
+  .ov-cta{
+    margin-top:36px;display:flex;gap:14px;align-items:center;flex-wrap:wrap;
+  }
+
+  .btn{
+    font-size:16.4px;font-weight:600;letter-spacing:.01em;
+    padding:13px 26px;border-radius:99px;transition:transform .12s ease,box-shadow .2s ease,background .2s ease;
+    display:inline-flex;align-items:center;gap:9px;
+  }
+  .btn-primary{background:var(--rust);color:var(--paper-3);box-shadow:0 10px 22px -10px var(--rust-deep)}
+  .btn-primary:hover{background:var(--rust-deep);transform:translateY(-1px)}
+  .btn-ghost{background:transparent;color:var(--ink);border:1.5px solid var(--line)}
+  .btn-ghost:hover{border-color:var(--ink-faint);background:var(--paper-2)}
+  .btn:active{transform:translateY(0)}
+  .btn.wide{padding:14px 30px}
+
+  /* ---------- module ---------- */
+  .m-top{display:flex;align-items:baseline;gap:14px;margin-bottom:8px}
+  .m-num{
+    font-family:'Fraunces',serif;font-size:17.5px;font-weight:600;
+    color:var(--rust);letter-spacing:.16em;text-transform:uppercase;
+  }
+  .m-track{font-size:14px;color:var(--ink-faint);letter-spacing:.14em;text-transform:uppercase}
+  .m-title{
+    font-family:'Fraunces',serif;font-weight:600;
+    font-size:clamp(37.4px,4vw,51.5px);line-height:1.06;letter-spacing:-.02em;
+    margin-bottom:14px;
+  }
+  .m-sub{font-size:21.1px;color:var(--ink-soft);line-height:1.58;margin-bottom:30px}
+
+  .callout{
+    border-left:3px solid var(--gold);background:var(--paper-3);
+    padding:16px 20px;border-radius:0 10px 10px 0;margin-bottom:34px;
+  }
+  .callout .cl-label{
+    font-size:12.3px;letter-spacing:.18em;text-transform:uppercase;
+    color:var(--gold);font-weight:700;margin-bottom:6px;
+  }
+  .callout p{font-size:17px;color:var(--ink-soft);line-height:1.56}
+
+  .sec{margin-bottom:32px}
+  .sec h3{
+    font-family:'Fraunces',serif;font-size:24.6px;font-weight:600;
+    letter-spacing:-.01em;margin-bottom:10px;
+  }
+  .sec h3 .sec-tick{
+    display:inline-block;width:7px;height:7px;background:var(--rust);
+    border-radius:2px;margin-right:10px;transform:translateY(-3px);
+  }
+  .sec p{font-size:18.1px;color:var(--ink-2);margin-bottom:13px;line-height:1.66}
+  .sec p:last-child{margin-bottom:0}
+  .sec strong{font-weight:600;color:var(--ink)}
+  .sec em{font-style:italic}
+
+  .concepts{
+    display:grid;grid-template-columns:1fr 1fr;gap:2px;
+    background:var(--line-soft);border:1px solid var(--line-soft);
+    border-radius:12px;overflow:hidden;margin:8px 0 4px;
+  }
+  .concept{background:var(--paper-2);padding:16px 18px}
+  .concept .cterm{
+    font-size:16.4px;font-weight:700;margin-bottom:4px;
+    display:flex;align-items:center;gap:8px;
+  }
+  .concept .cterm::before{
+    content:"";width:5px;height:5px;border-radius:50%;
+    background:var(--forest);flex-shrink:0;
+  }
+  .concept .cdef{font-size:15.2px;color:var(--ink-soft);line-height:1.5}
+
+  .apply{
+    background:var(--forest);color:#e8e2d2;border-radius:12px;
+    padding:22px 24px;margin:34px 0;position:relative;overflow:hidden;
+  }
+  .apply::after{
+    content:"";position:absolute;right:-30px;bottom:-40px;
+    width:150px;height:150px;border-radius:50%;
+    background:radial-gradient(circle,rgba(190,145,46,.22),transparent 70%);
+  }
+  .apply .ap-label{
+    font-size:12.3px;letter-spacing:.18em;text-transform:uppercase;
+    color:var(--gold);font-weight:700;margin-bottom:9px;
+    display:flex;align-items:center;gap:8px;
+  }
+  .apply h4{
+    font-family:'Fraunces',serif;font-size:21.1px;font-weight:600;
+    color:var(--paper-3);margin-bottom:8px;
+  }
+  .apply p{font-size:17px;line-height:1.6;color:#ddd6c5;position:relative;z-index:1}
+  .apply p+p{margin-top:10px}
+
+  /* ---------- infographic ---------- */
+  .figure{
+    margin:34px 0;border:1px solid var(--line);border-radius:var(--radius);
+    background:var(--paper-3);overflow:hidden;
+  }
+  .figure-head{
+    padding:15px 22px 0;display:flex;align-items:baseline;
+    justify-content:space-between;gap:14px;flex-wrap:wrap;
+  }
+  .figure-kicker{
+    font-size:12.3px;letter-spacing:.18em;text-transform:uppercase;
+    color:var(--rust);font-weight:700;display:flex;align-items:center;gap:7px;
+  }
+  .figure-kicker::before{
+    content:"";width:13px;height:13px;border-radius:3px;
+    background:var(--rust);
+    -webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M2 2h5v5H2zM9 2h5v5H9zM2 9h5v5H2zM9 9h5v5H9z'/%3E%3C/svg%3E") center/contain no-repeat;
+    mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M2 2h5v5H2zM9 2h5v5H9zM2 9h5v5H2zM9 9h5v5H9z'/%3E%3C/svg%3E") center/contain no-repeat;
+  }
+  .figure-name{
+    font-family:'Fraunces',serif;font-size:15.2px;font-weight:600;
+    color:var(--ink-faint);font-style:italic;
+  }
+  .figure-body{padding:14px 22px 20px}
+  .figure svg{display:block;width:100%;height:auto;overflow:visible}
+  .figure-cap{
+    font-size:14.6px;color:var(--ink-soft);line-height:1.5;
+    padding:0 22px 16px;margin-top:-4px;
+  }
+  .figure-cap strong{color:var(--ink);font-weight:600}
+  /* shared svg text classes */
+  .fg-t{font-family:'Hanken Grotesk',sans-serif}
+  .fg-display{font-family:'Fraunces',serif}
+
+  /* ---------- quiz ---------- */
+  .quiz{
+    border:1px solid var(--line);border-radius:var(--radius);
+    background:var(--paper-2);padding:26px 26px 22px;margin:40px 0 24px;
+  }
+  .quiz-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
+  .quiz-title{
+    font-family:'Fraunces',serif;font-size:22.2px;font-weight:600;
+    display:flex;align-items:center;gap:10px;
+  }
+  .quiz-title svg{flex-shrink:0}
+  .quiz-score{
+    font-size:14px;font-weight:600;color:var(--ink-faint);
+    letter-spacing:.03em;
+  }
+  .quiz-score.good{color:var(--correct)}
+  .quiz-intro{font-size:15.8px;color:var(--ink-soft);margin-bottom:20px}
+
+  .q{margin-bottom:22px}
+  .q:last-child{margin-bottom:0}
+  .q-text{font-size:17.5px;font-weight:600;margin-bottom:12px;line-height:1.5}
+  .q-text .q-n{color:var(--rust);margin-right:7px;font-variant-numeric:lining-nums}
+  .opt{
+    width:100%;text-align:left;display:flex;gap:11px;align-items:flex-start;
+    padding:11px 14px;border:1.5px solid var(--line);border-radius:10px;
+    background:var(--paper-3);margin-bottom:8px;font-size:16.4px;color:var(--ink-2);
+    transition:border-color .15s ease,background .15s ease,transform .08s ease;
+  }
+  .opt:hover:not(.disabled){border-color:var(--ink-faint)}
+  .opt:active:not(.disabled){transform:scale(.995)}
+  .opt.disabled{cursor:default}
+  .opt-key{
+    flex-shrink:0;width:20px;height:20px;border-radius:6px;
+    border:1.5px solid var(--line);display:grid;place-items:center;
+    font-size:12.9px;font-weight:700;color:var(--ink-faint);
+    background:var(--paper-2);transition:all .15s ease;
+  }
+  .opt.correct{border-color:var(--correct);background:var(--correct-bg)}
+  .opt.correct .opt-key{background:var(--correct);border-color:var(--correct);color:#fff}
+  .opt.wrong{border-color:var(--wrong);background:var(--wrong-bg)}
+  .opt.wrong .opt-key{background:var(--wrong);border-color:var(--wrong);color:#fff}
+  .opt.muted{opacity:.55}
+  .explain{
+    font-size:15.8px;line-height:1.56;padding:12px 14px;border-radius:9px;
+    margin-top:4px;display:none;
+  }
+  .explain.show{display:block;animation:rise .3s ease}
+  .explain.right{background:var(--correct-bg);color:#234a37}
+  .explain.right strong{color:var(--correct)}
+  .explain.miss{background:var(--wrong-bg);color:#5e2a22}
+  .explain.miss strong{color:var(--wrong)}
+
+  /* ---------- reflection ---------- */
+  .reflect{margin:34px 0 10px}
+  .reflect-label{
+    font-family:'Fraunces',serif;font-size:21.1px;font-weight:600;
+    margin-bottom:5px;
+  }
+  .reflect-hint{font-size:15.8px;color:var(--ink-soft);margin-bottom:12px}
+  .reflect textarea{
+    width:100%;min-height:108px;resize:vertical;font-family:inherit;
+    font-size:17px;line-height:1.6;color:var(--ink);
+    background:var(--paper-3);border:1.5px solid var(--line);
+    border-radius:11px;padding:14px 16px;transition:border-color .15s ease;
+  }
+  .reflect textarea:focus{outline:none;border-color:var(--gold)}
+  .reflect textarea::placeholder{color:var(--ink-faint)}
+  .saved-tag{
+    font-size:13.5px;color:var(--ink-faint);margin-top:7px;
+    display:flex;align-items:center;gap:6px;height:14px;
+    opacity:0;transition:opacity .3s ease;
+  }
+  .saved-tag.show{opacity:1}
+
+  /* ---------- module footer nav ---------- */
+  .m-footer{
+    margin-top:42px;padding-top:26px;border-top:1px solid var(--line);
+    display:flex;justify-content:space-between;align-items:center;gap:14px;
+  }
+  .m-footer .fnav{
+    font-size:15.2px;color:var(--ink-soft);display:flex;align-items:center;gap:8px;
+    transition:color .15s ease;
+  }
+  .m-footer .fnav:hover{color:var(--rust)}
+  .m-footer .fnav.disabled{opacity:.3;pointer-events:none}
+
+  /* ---------- glossary ---------- */
+  .gl-search{
+    width:100%;font-family:inherit;font-size:17.5px;
+    background:var(--paper-2);border:1.5px solid var(--line);
+    border-radius:11px;padding:13px 16px;margin-bottom:24px;color:var(--ink);
+  }
+  .gl-search:focus{outline:none;border-color:var(--gold)}
+  .gl-item{
+    border-bottom:1px solid var(--line-soft);padding:16px 2px;
+  }
+  .gl-item:last-child{border-bottom:none}
+  .gl-term{
+    font-family:'Fraunces',serif;font-size:19.9px;font-weight:600;
+    margin-bottom:3px;
+  }
+  .gl-term span{
+    font-family:'Hanken Grotesk';font-size:12.3px;font-weight:600;
+    color:var(--rust);letter-spacing:.08em;text-transform:uppercase;
+    margin-left:10px;
+  }
+  .gl-def{font-size:17px;color:var(--ink-soft);line-height:1.58}
+  .gl-empty{color:var(--ink-faint);font-size:16.4px;padding:20px 2px}
+
+  /* ---------- capstone ---------- */
+  .cap-step{
+    display:flex;gap:18px;margin-bottom:8px;padding:22px 0;
+    border-bottom:1px solid var(--line-soft);
+  }
+  .cap-step:last-of-type{border-bottom:none}
+  .cap-n{
+    font-family:'Fraunces',serif;font-size:30.4px;font-weight:500;
+    color:var(--rust);line-height:1;flex-shrink:0;width:40px;
+  }
+  .cap-b{flex:1}
+  .cap-b h4{font-size:19.3px;font-weight:700;margin-bottom:5px}
+  .cap-b p{font-size:16.4px;color:var(--ink-soft);line-height:1.58;margin-bottom:11px}
+  .cap-b textarea{
+    width:100%;min-height:84px;resize:vertical;font-family:inherit;
+    font-size:16.4px;line-height:1.58;color:var(--ink);
+    background:var(--paper-3);border:1.5px solid var(--line);
+    border-radius:10px;padding:12px 14px;
+  }
+  .cap-b textarea:focus{outline:none;border-color:var(--gold)}
+  .cap-locked{
+    text-align:center;padding:50px 30px;background:var(--paper-2);
+    border:1px dashed var(--line);border-radius:var(--radius);
+  }
+  .cap-locked .cl-ico{font-size:35.1px;margin-bottom:12px}
+  .cap-locked h4{font-family:'Fraunces',serif;font-size:23.4px;font-weight:600;margin-bottom:8px}
+  .cap-locked p{font-size:16.4px;color:var(--ink-soft);max-width:380px;margin:0 auto}
+
+  .complete-banner{
+    background:linear-gradient(135deg,var(--rust),var(--rust-deep));
+    color:var(--paper-3);border-radius:var(--radius);
+    padding:28px 30px;margin-bottom:34px;position:relative;overflow:hidden;
+  }
+  .complete-banner::after{
+    content:"";position:absolute;right:-40px;top:-60px;width:200px;height:200px;
+    border-radius:50%;background:radial-gradient(circle,rgba(190,145,46,.35),transparent 70%);
+  }
+  .complete-banner .cb-k{
+    font-size:12.3px;letter-spacing:.2em;text-transform:uppercase;
+    color:var(--gold);font-weight:700;margin-bottom:8px;
+  }
+  .complete-banner h3{
+    font-family:'Fraunces',serif;font-size:28.1px;font-weight:600;
+    margin-bottom:6px;position:relative;z-index:1;
+  }
+  .complete-banner p{font-size:17px;color:#eee6d3;position:relative;z-index:1}
+
+  /* ---------- operator track ---------- */
+  .op-northstar{
+    background:var(--ink);color:var(--paper-3);border-radius:var(--radius);
+    padding:24px 26px;margin:4px 0 30px;position:relative;overflow:hidden;
+  }
+  .op-northstar::after{
+    content:"";position:absolute;right:-50px;bottom:-70px;width:210px;height:210px;
+    border-radius:50%;background:radial-gradient(circle,rgba(184,71,42,.4),transparent 70%);
+  }
+  .op-ns-label{
+    font-size:12.3px;letter-spacing:.2em;text-transform:uppercase;
+    color:var(--gold);font-weight:700;margin-bottom:9px;
+    display:flex;align-items:center;gap:8px;
+  }
+  .op-northstar .op-ns-quote{
+    font-family:'Fraunces',serif;font-size:21.1px;line-height:1.46;
+    font-style:italic;color:var(--paper-3);position:relative;z-index:1;
+  }
+  .op-northstar textarea{
+    width:100%;min-height:88px;resize:vertical;font-family:'Fraunces',serif;
+    font-style:italic;font-size:18.1px;line-height:1.5;color:var(--paper-3);
+    background:#2c281f;border:1.5px solid #423b2e;border-radius:10px;
+    padding:13px 15px;margin-top:12px;position:relative;z-index:1;
+  }
+  .op-northstar textarea:focus{outline:none;border-color:var(--gold)}
+  .op-northstar textarea::placeholder{color:#7d745f}
+  .op-ns-hint{
+    font-size:13.5px;color:#8b8270;margin-top:8px;position:relative;z-index:1;
+  }
+
+  /* gap map */
+  .gap-row{
+    border:1px solid var(--line);border-radius:12px;background:var(--paper-2);
+    padding:18px 20px;margin-bottom:12px;
+  }
+  .gap-top{display:flex;align-items:baseline;gap:12px;margin-bottom:4px;flex-wrap:wrap}
+  .gap-name{font-family:'Fraunces',serif;font-size:21.1px;font-weight:600}
+  .gap-why{
+    font-size:14px;color:var(--rust);font-weight:600;
+    letter-spacing:.02em;
+  }
+  .gap-learn{font-size:15.8px;color:var(--ink-2);line-height:1.5;margin-bottom:4px}
+  .gap-learn b{font-weight:600}
+  .gap-proof{
+    font-size:14.6px;color:var(--ink-soft);line-height:1.5;
+    background:var(--paper-3);border-left:3px solid var(--gold);
+    padding:8px 12px;border-radius:0 8px 8px 0;margin:10px 0 14px;
+  }
+  .gap-proof b{color:var(--ink);font-weight:600}
+  .gap-rate{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:10px}
+  .gap-lvl{
+    font-size:13.5px;font-weight:600;letter-spacing:.02em;
+    padding:6px 13px;border-radius:99px;border:1.5px solid var(--line);
+    background:var(--paper-3);color:var(--ink-faint);transition:all .14s ease;
+  }
+  .gap-lvl:hover{border-color:var(--ink-faint)}
+  .gap-lvl.on{background:var(--forest);border-color:var(--forest);color:var(--paper-3)}
+  .gap-lvl[data-lvl="1"].on{background:#9a8a4e;border-color:#9a8a4e}
+  .gap-lvl[data-lvl="2"].on{background:var(--gold);border-color:var(--gold)}
+  .gap-lvl[data-lvl="3"].on{background:#5a6b3f;border-color:#5a6b3f}
+  .gap-lvl[data-lvl="4"].on{background:var(--forest);border-color:var(--forest)}
+  .gap-note{
+    width:100%;min-height:54px;resize:vertical;font-family:inherit;
+    font-size:15.2px;line-height:1.5;color:var(--ink);
+    background:var(--paper-3);border:1.5px solid var(--line);
+    border-radius:9px;padding:9px 12px;
+  }
+  .gap-note:focus{outline:none;border-color:var(--gold)}
+  .gap-note::placeholder{color:var(--ink-faint)}
+
+  /* sprint */
+  .wk{
+    border:1px solid var(--line);border-radius:12px;background:var(--paper-2);
+    margin-bottom:14px;overflow:hidden;
+  }
+  .wk-head{
+    display:flex;align-items:center;gap:14px;padding:16px 20px;
+    background:var(--paper-3);border-bottom:1px solid var(--line-soft);
+  }
+  .wk-badge{
+    flex-shrink:0;width:54px;height:54px;border-radius:11px;
+    background:var(--ink);color:var(--paper-3);display:flex;
+    flex-direction:column;align-items:center;justify-content:center;line-height:1;
+  }
+  .wk-badge b{font-family:'Fraunces',serif;font-size:24.6px;font-weight:600}
+  .wk-badge span{font-size:9.4px;letter-spacing:.14em;text-transform:uppercase;margin-top:3px;color:var(--gold)}
+  .wk-htext{flex:1}
+  .wk-htext h4{font-family:'Fraunces',serif;font-size:21.1px;font-weight:600}
+  .wk-htext p{font-size:14.6px;color:var(--ink-soft);margin-top:1px}
+  .wk-count{
+    font-size:13.5px;font-weight:600;color:var(--ink-faint);
+    letter-spacing:.03em;flex-shrink:0;
+  }
+  .wk-count.done{color:var(--correct)}
+  .wk-body{padding:14px 20px 18px}
+  .task{
+    display:flex;gap:11px;align-items:flex-start;padding:9px 0;
+    border-bottom:1px solid var(--line-soft);
+  }
+  .task:last-of-type{border-bottom:none}
+  .task-box{
+    flex-shrink:0;width:21px;height:21px;border-radius:6px;
+    border:1.8px solid var(--line);background:var(--paper-3);
+    display:grid;place-items:center;margin-top:1px;transition:all .15s ease;
+  }
+  .task-box:hover{border-color:var(--ink-faint)}
+  .task-box.checked{background:var(--rust);border-color:var(--rust)}
+  .task-box svg{opacity:0;transition:opacity .15s ease}
+  .task-box.checked svg{opacity:1}
+  .task-text{flex:1;font-size:16.4px;color:var(--ink-2);line-height:1.5;padding-top:1px}
+  .task-text.struck{color:var(--ink-faint);text-decoration:line-through;text-decoration-color:var(--line)}
+  .wk-note-label{
+    font-size:12.9px;letter-spacing:.1em;text-transform:uppercase;
+    color:var(--ink-faint);font-weight:700;margin:14px 0 6px;
+  }
+  .wk-note{
+    width:100%;min-height:62px;resize:vertical;font-family:inherit;
+    font-size:15.8px;line-height:1.55;color:var(--ink);
+    background:var(--paper-3);border:1.5px solid var(--line);
+    border-radius:9px;padding:10px 12px;
+  }
+  .wk-note:focus{outline:none;border-color:var(--gold)}
+
+  /* operator quiz */
+  .wk-tabs{display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap}
+  .wk-tab{
+    font-size:15.2px;font-weight:600;padding:9px 18px;border-radius:99px;
+    border:1.5px solid var(--line);background:var(--paper-2);
+    color:var(--ink-soft);transition:all .14s ease;
+  }
+  .wk-tab:hover{border-color:var(--ink-faint)}
+  .wk-tab.on{background:var(--ink);border-color:var(--ink);color:var(--paper-3)}
+  .opq{
+    border:1px solid var(--line);border-radius:12px;background:var(--paper-2);
+    padding:16px 18px;margin-bottom:11px;
+  }
+  .opq-q{
+    font-size:16.4px;font-weight:600;margin-bottom:8px;
+    display:flex;gap:9px;align-items:baseline;
+  }
+  .opq-q .opq-n{
+    color:var(--rust);font-family:'Fraunces',serif;font-size:17.5px;flex-shrink:0;
+  }
+  .opq textarea{
+    width:100%;min-height:56px;resize:vertical;font-family:inherit;
+    font-size:15.8px;line-height:1.55;color:var(--ink);
+    background:var(--paper-3);border:1.5px solid var(--line);
+    border-radius:9px;padding:9px 12px;
+  }
+  .opq textarea:focus{outline:none;border-color:var(--gold)}
+  .opq textarea::placeholder{color:var(--ink-faint)}
+
+  .artifact-box{
+    border:1px solid var(--line);border-radius:12px;
+    background:var(--paper-3);padding:20px 22px;margin-bottom:12px;
+  }
+  .artifact-box h4{
+    font-family:'Fraunces',serif;font-size:19.9px;font-weight:600;margin-bottom:3px;
+    display:flex;align-items:center;gap:9px;
+  }
+  .artifact-box .ab-tag{
+    font-size:11.1px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;
+    background:var(--rust);color:var(--paper-3);padding:3px 8px;border-radius:99px;
+  }
+  .artifact-box p{font-size:15.2px;color:var(--ink-soft);line-height:1.5;margin-bottom:10px}
+  .artifact-box textarea{
+    width:100%;min-height:80px;resize:vertical;font-family:inherit;
+    font-size:15.8px;line-height:1.55;color:var(--ink);
+    background:var(--paper-2);border:1.5px solid var(--line);
+    border-radius:9px;padding:10px 12px;
+  }
+  .artifact-box textarea:focus{outline:none;border-color:var(--gold)}
+
+  /* ---------- mobile ---------- */
+  .menu-btn{
+    display:none;position:fixed;top:14px;left:14px;z-index:60;
+    width:44px;height:44px;border-radius:11px;background:var(--ink);
+    color:var(--paper-3);place-items:center;box-shadow:var(--shadow);
+  }
+  .scrim{display:none;position:fixed;inset:0;background:rgba(34,30,24,.5);z-index:40}
+
+  @media(max-width:880px){
+    .menu-btn{display:grid}
+    .scrim.show{display:block}
+    .sidebar{
+      position:fixed;left:0;top:0;bottom:0;z-index:50;
+      transform:translateX(-100%);transition:transform .3s cubic-bezier(.4,0,.2,1);
+      width:300px;box-shadow:0 0 60px rgba(0,0,0,.4);
+    }
+    .sidebar.open{transform:translateX(0)}
+    .stage{padding:74px 24px 100px}
+    .concepts{grid-template-columns:1fr}
+    .ov-card{flex-wrap:wrap}
+    .ov-cmeta{flex-direction:row;width:100%;justify-content:flex-start;margin-top:4px}
+  }
+  @media(max-width:520px){
+    .stage{padding:74px 18px 90px}
+    .ov-num{width:38px;font-size:29.3px}
+    .m-footer{flex-direction:column;align-items:stretch}
+  }
+</style>
+
+<div class="app">
+  <button class="menu-btn" id="menuBtn" aria-label="Menu">
+    <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M3 5h14M3 10h14M3 15h14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+  </button>
+  <div class="scrim" id="scrim"></div>
+
+  <aside class="sidebar" id="sidebar">
+    <div class="sb-head">
+      <div class="sb-kicker">Executive Learning Track</div>
+      <div class="sb-title">The AI <em>Mini-MBA</em></div>
+    </div>
+    <div class="sb-progress-wrap">
+      <div class="sb-progress-meta">
+        <span>Course progress</span>
+        <strong id="progPct">0%</strong>
+      </div>
+      <div class="sb-bar"><i id="progBar"></i></div>
+    </div>
+    <nav class="sb-nav" id="nav"></nav>
+    <div class="sb-foot">
+      <span style="font-size:11px;color:var(--ink-faint)">10 modules &middot; self-paced</span>
+      <button id="resetBtn" title="Reset all progress">
+        <svg width="13" height="13" viewBox="0 0 14 14" fill="none"><path d="M11.5 5.5A4.5 4.5 0 1 0 12 8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><path d="M11.5 2v3.5H8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Reset
+      </button>
+    </div>
+  </aside>
+
+  <main class="main" id="main">
+    <div class="stage" id="stage"></div>
+  </main>
+</div>
+
+<script>
+/* ============================================================
+   COURSE CONTENT
+   ============================================================ */
+const COURSE = [
+  {
+    id:"m1", track:"Foundations",
+    title:"Introduction to AI",
+    sub:"Before you can lead AI adoption, you need a clear map of what these technologies actually are \u2014 and where the hype ends and the real risk begins.",
+    why:"You sit between vendors, your transformation team, and executives. Everyone is using the word \u201cAI\u201d to mean different things. Your first job is to be the person in the room who can tell the difference.",
+    sections:[
+      {h:"Automation is a spectrum, not a switch",
+       b:["Technology has always automated work. What's changed is <em>how</em>. Traditional automation follows explicit rules a person wrote down: <strong>if this, then that</strong>. It's predictable, auditable, and brittle \u2014 it does exactly what it was told and nothing more. Robotic process automation (RPA) lives here.",
+          "Modern AI shifts from <strong>rules you write</strong> to <strong>patterns the system learns</strong>. Instead of specifying every step, you give the system examples and let it infer the logic. That makes it powerful on messy, judgment-heavy work \u2014 and also less predictable. Knowing which kind of automation a problem needs is the single most useful instinct a transformation leader can build."]},
+      {h:"Hype vs. reality on AI danger",
+       b:["Public conversation swings between two extremes: AI as an existential threat, and AI as harmless magic. Neither helps you make decisions. The <strong>real</strong> near-term risks are mundane and manageable: biased outputs, confident-sounding errors, data leakage, over-reliance, and unclear accountability when something goes wrong.",
+          "Treat AI risk the way you'd treat any operational risk \u2014 name it, size it, assign an owner, and put controls around it. The danger isn't science fiction; it's deploying a tool you don't understand into a process you can't monitor."]},
+      {h:"Three families of AI \u2014 and what each is for",
+       b:["<strong>Machine learning (ML)</strong> finds patterns in data to predict or classify: who is likely to lapse a policy, which claim looks unusual, what a process will cost next quarter. It's best when you have history and a clear thing to predict.",
+          "<strong>Generative AI</strong> creates new content \u2014 text, summaries, drafts, code, images. It's best for drafting, synthesizing, and explaining. It's a strong first-drafter and a weak final authority.",
+          "<strong>Agentic AI</strong> takes multi-step action toward a goal, using tools and making decisions along the way. It's the newest and most powerful \u2014 and the one that most needs guardrails, because it <em>acts</em>, not just answers."]},
+      {h:"Who you actually need on the team",
+       b:["An AI project is not an IT project handed to engineers. It needs a <strong>domain expert</strong> who knows the process cold, a <strong>data person</strong> who can get the data into usable shape, a <strong>technical builder</strong>, a <strong>product owner</strong> who keeps it tied to a business outcome, and someone owning <strong>risk and ethics</strong>. On small efforts one person wears several hats \u2014 but every hat has to be worn."]}
+    ],
+    concepts:[
+      {t:"Rules-based automation",d:"Follows logic a human explicitly wrote. Predictable and auditable, but brittle on anything messy."},
+      {t:"Machine learning",d:"Learns patterns from historical data to predict or classify. Needs history and a clear target."},
+      {t:"Generative AI",d:"Produces new content \u2014 text, summaries, drafts. Excellent first-drafter, poor final authority."},
+      {t:"Agentic AI",d:"Pursues a goal across multiple steps using tools. Most capable, most in need of guardrails."},
+      {t:"Probabilistic output",d:"AI gives likely answers, not guaranteed ones. The same input can vary; design for that."},
+      {t:"Domain expert",d:"The person who knows the process being changed. Without them, AI solves the wrong problem well."}
+    ],
+    apply:{h:"For your innovation function",
+      p:["When a vendor pitches you, your first question is now: <em>which family of AI is this, and is it the right family for the problem?</em> A chatbot vendor selling \u201cAI underwriting\u201d may really be selling generative summaries dressed up as decision-making.",
+         "As you stand up innovation, write down the three AI families on a one-pager and use it to triage every incoming idea. Half of \u201cAI projects\u201d are actually rules-based automation that your RPA capability already handles \u2014 cheaper and more reliably."]},
+    quiz:[
+      {q:"A team wants to auto-route incoming policy-service emails to the right queue based on content. Historical routing data exists. Which approach fits best first?",
+       o:["Agentic AI that takes action across systems","Machine learning classification trained on the historical routing","Generative AI to rewrite each email","A new rules engine maintained by hand"],
+       a:1,
+       e:"This is a classic prediction/classification problem with labeled history \u2014 the natural home of supervised ML. Agentic AI is overkill, generative AI doesn't route, and hand-maintained rules are the brittle option you're trying to move past."},
+      {q:"An executive says \u201cAI is too dangerous to touch.\u201d The most useful reframe for a transformation leader is:",
+       o:["Agree \u2014 wait until the technology is safe","Dismiss the concern as hype","Name the concrete near-term risks and propose controls for each","Promise AI will never make mistakes"],
+       a:2,
+       e:"Leadership maturity is treating AI risk like any operational risk: name it, size it, assign an owner, control it. Blanket avoidance and blanket dismissal both abdicate the judgment your role exists to provide."},
+      {q:"What most reliably separates a successful AI project team from a failing one?",
+       o:["The seniority of the engineers","Having a domain expert and a product owner tied to a business outcome","Using the newest model available","The size of the data science budget"],
+       a:1,
+       e:"AI projects fail when they're handed to technologists with no one anchoring them to the real process and the real outcome. Talent and tooling matter, but the domain expert and product owner are what keep the work solving the right problem."}
+    ],
+    fig:{
+      name:"The Automation Spectrum",
+      cap:"Not all \u201cAI\u201d sits in the same place. As you move right, systems get more capable and more autonomous \u2014 and need more oversight. <strong>Knowing which point a problem actually needs is the core triage instinct.</strong>",
+      svg:`<svg viewBox='0 0 720 244' xmlns='http://www.w3.org/2000/svg'>
+        <g>
+          <rect x='6' y='12' width='174' height='124' rx='10' fill='var(--paper-2)' stroke='var(--line)'/>
+          <path d='M6 22 a10 10 0 0 1 10 -10 h154 a10 10 0 0 1 10 10 v16 H6 Z' fill='#8B8270'/>
+          <text x='93' y='30' text-anchor='middle' fill='var(--paper-3)' font-size='12.5' font-weight='700' class='fg-t'>Rules-Based</text>
+          <text x='20' y='62' fill='var(--ink-2)' font-size='11' class='fg-t'><tspan x='20'>Logic a human</tspan><tspan x='20' dy='14'>explicitly wrote.</tspan></text>
+          <text x='20' y='100' fill='var(--ink-faint)' font-size='8.5' font-weight='700' letter-spacing='.09em' class='fg-t'>BEST FOR</text>
+          <text x='20' y='115' fill='var(--ink-soft)' font-size='10.5' class='fg-t'><tspan x='20'>Stable, well-defined</tspan><tspan x='20' dy='13'>steps</tspan></text>
+        </g>
+        <g>
+          <rect x='184' y='12' width='174' height='124' rx='10' fill='var(--paper-2)' stroke='var(--line)'/>
+          <path d='M184 22 a10 10 0 0 1 10 -10 h154 a10 10 0 0 1 10 10 v16 H184 Z' fill='var(--forest)'/>
+          <text x='271' y='30' text-anchor='middle' fill='var(--paper-3)' font-size='12.5' font-weight='700' class='fg-t'>Machine Learning</text>
+          <text x='198' y='62' fill='var(--ink-2)' font-size='11' class='fg-t'><tspan x='198'>Learns patterns</tspan><tspan x='198' dy='14'>from history.</tspan></text>
+          <text x='198' y='100' fill='var(--ink-faint)' font-size='8.5' font-weight='700' letter-spacing='.09em' class='fg-t'>BEST FOR</text>
+          <text x='198' y='115' fill='var(--ink-soft)' font-size='10.5' class='fg-t'><tspan x='198'>Prediction &amp;</tspan><tspan x='198' dy='13'>classification</tspan></text>
+        </g>
+        <g>
+          <rect x='362' y='12' width='174' height='124' rx='10' fill='var(--paper-2)' stroke='var(--line)'/>
+          <path d='M362 22 a10 10 0 0 1 10 -10 h154 a10 10 0 0 1 10 10 v16 H362 Z' fill='var(--gold)'/>
+          <text x='449' y='30' text-anchor='middle' fill='var(--paper-3)' font-size='12.5' font-weight='700' class='fg-t'>Generative AI</text>
+          <text x='376' y='62' fill='var(--ink-2)' font-size='11' class='fg-t'><tspan x='376'>Creates new</tspan><tspan x='376' dy='14'>content.</tspan></text>
+          <text x='376' y='100' fill='var(--ink-faint)' font-size='8.5' font-weight='700' letter-spacing='.09em' class='fg-t'>BEST FOR</text>
+          <text x='376' y='115' fill='var(--ink-soft)' font-size='10.5' class='fg-t'><tspan x='376'>Drafting, summarizing</tspan><tspan x='376' dy='13'>&amp; explaining</tspan></text>
+        </g>
+        <g>
+          <rect x='540' y='12' width='174' height='124' rx='10' fill='var(--paper-2)' stroke='var(--line)'/>
+          <path d='M540 22 a10 10 0 0 1 10 -10 h154 a10 10 0 0 1 10 10 v16 H540 Z' fill='var(--rust)'/>
+          <text x='627' y='30' text-anchor='middle' fill='var(--paper-3)' font-size='12.5' font-weight='700' class='fg-t'>Agentic AI</text>
+          <text x='554' y='62' fill='var(--ink-2)' font-size='11' class='fg-t'><tspan x='554'>Acts across steps</tspan><tspan x='554' dy='14'>toward a goal.</tspan></text>
+          <text x='554' y='100' fill='var(--ink-faint)' font-size='8.5' font-weight='700' letter-spacing='.09em' class='fg-t'>BEST FOR</text>
+          <text x='554' y='115' fill='var(--ink-soft)' font-size='10.5' class='fg-t'><tspan x='554'>Multi-step work \u2014</tspan><tspan x='554' dy='13'>with guardrails</tspan></text>
+        </g>
+        <text x='24' y='168' fill='var(--ink)' font-size='10' font-weight='700' letter-spacing='.05em' class='fg-t'>PREDICTABILITY &amp; AUDITABILITY</text>
+        <text x='712' y='168' text-anchor='end' fill='var(--ink-faint)' font-size='9.5' class='fg-t'>greatest at the rules-based end</text>
+        <path d='M8 180 l15 -6 v12 Z' fill='#8B8270'/>
+        <line x1='23' y1='180' x2='712' y2='180' stroke='var(--line-soft)' stroke-width='6' stroke-linecap='round'/>
+        <text x='8' y='216' fill='var(--ink)' font-size='10' font-weight='700' letter-spacing='.05em' class='fg-t'>CAPABILITY, AUTONOMY &amp; GUARDRAILS NEEDED</text>
+        <text x='712' y='216' text-anchor='end' fill='var(--rust)' font-size='9.5' font-weight='600' class='fg-t'>greatest at the agentic end</text>
+        <path d='M712 228 l-15 -6 v12 Z' fill='var(--rust)'/>
+        <line x1='8' y1='228' x2='697' y2='228' stroke='var(--line-soft)' stroke-width='6' stroke-linecap='round'/>
+      </svg>`
+    },
+    reflect:"Name one process in your partnerships or BPO work that people call an \u201cAI opportunity.\u201d Which family of AI does it actually need \u2014 and is it possible it's really just rules-based automation?"
+  },
+
+  {
+    id:"m2", track:"Foundations",
+    title:"Data Analytics",
+    sub:"Data is the fuel of AI. An AI project doesn't mature by adding features \u2014 it matures by using data to get more accurate. That changes how you scope and judge it.",
+    why:"A life & annuity company is rich in data: policies, claims, persistency, actuarial history, and the operational exhaust of every BPO relationship you manage. Knowing which of that data is actually <em>AI-ready</em> is how you avoid expensive dead ends.",
+    sections:[
+      {h:"Why AI projects don't behave like software projects",
+       b:["A traditional software project matures by adding features on a roadmap. An AI project matures differently: the deliverable is roughly fixed, and what improves over time is <strong>accuracy</strong>, driven by better and more data. You can run it with agile ceremonies, but the success metric isn't \u201cfeatures shipped\u201d \u2014 it's \u201cdid the model get measurably better at the one thing it does.\u201d",
+          "This is why \u201cwhen will it be done?\u201d is the wrong question. The right question is \u201chow good is good enough, and what data gets us there?\u201d"]},
+      {h:"Data readiness \u2014 the real gate",
+       b:["Before committing to an AI project, assess whether the data can actually carry it. Five things matter: <strong>volume</strong> (enough examples), <strong>quality</strong> (clean, consistent, current), <strong>labels</strong> (do you know the right answers for past cases?), <strong>access</strong> (can you actually get the data out of the system it lives in?), and <strong>representativeness</strong> (does it reflect the full range of cases, not just the easy ones?).",
+          "A process can be a perfect AI candidate on paper and a non-starter because the data is trapped in a legacy system, or because nobody ever recorded the outcomes you'd need to learn from."]},
+      {h:"The problems hiding in your data",
+       b:["Most data problems aren't \u201cnot enough data\u201d \u2014 they're <strong>bias</strong> (the history reflects past decisions you may not want to repeat), <strong>gaps</strong> (missing fields, missing populations), <strong>silos</strong> (the same customer represented five different ways), and <strong>drift</strong> (the world changed but the data didn't).",
+          "Spotting these early is cheaper than discovering them in production. A model trained on biased history will reproduce that bias confidently and at scale."]},
+      {h:"The improvement loop",
+       b:["AI gets better through a cycle: <strong>collect</strong> data \u2192 <strong>train</strong> on it \u2192 <strong>evaluate</strong> against reality \u2192 <strong>correct</strong> errors and gaps \u2192 <strong>retrain</strong>. Budgeting for an AI capability means budgeting for that loop to keep turning \u2014 not just for a one-time build. A model that's never retrained quietly decays as the world moves on."]}
+    ],
+    concepts:[
+      {t:"Data readiness",d:"Whether data has the volume, quality, labels, access, and representativeness an AI project needs."},
+      {t:"Labeled data",d:"Past cases where the correct outcome is recorded \u2014 what supervised models learn from."},
+      {t:"Data bias",d:"When historical data reflects past decisions or gaps you don't want the model to repeat."},
+      {t:"Data drift",d:"When the real world shifts but the data \u2014 and the model \u2014 doesn't keep up."},
+      {t:"Data silo",d:"The same entity represented inconsistently across systems, making it hard to learn from."},
+      {t:"Improvement loop",d:"Collect \u2192 train \u2192 evaluate \u2192 correct \u2192 retrain. Ongoing, not one-time."}
+    ],
+    apply:{h:"For your BPO and partnerships data",
+      p:["Every BPO relationship you manage produces operational data \u2014 handle times, error rates, rework, exceptions. That's often cleaner and better-labeled than core policy data, which makes BPO process data an underrated <em>first</em> place to prove an AI capability.",
+         "Before you greenlight any pilot, run a one-page data-readiness check: volume, quality, labels, access, representativeness. If it fails on access or labels, the answer isn't \u201cno\u201d \u2014 it's \u201cfix the data foundation first,\u201d which is itself a fundable project."]},
+    quiz:[
+      {q:"A business sponsor asks \u201cwhen will the AI model be finished?\u201d The most accurate response is:",
+       o:["Give a fixed delivery date like any software project","Explain it improves toward an accuracy target as data improves \u2014 define \u2018good enough\u2019 instead","Say AI is never finished, so the question is meaningless","Promise it by the end of the quarter to keep momentum"],
+       a:1,
+       e:"AI projects mature by getting more accurate, not by shipping features. Reframing around an accuracy target and the data needed to hit it sets honest expectations \u2014 without being dismissive."},
+      {q:"A process is high-volume and rules-light \u2014 a strong AI candidate \u2014 but outcomes were never recorded in any system. The blocker is:",
+       o:["Volume","Representativeness","Labels \u2014 there's nothing for a model to learn the \u2018right answer\u2019 from","Drift"],
+       a:2,
+       e:"Without recorded outcomes, there are no labels, and supervised learning has nothing to train against. The fix is to start capturing outcomes \u2014 a foundational project in its own right."},
+      {q:"Why is a model trained on biased historical decisions especially risky?",
+       o:["It runs too slowly","It reproduces the bias confidently and at scale, while looking objective","It needs more storage","It can't be retrained"],
+       a:1,
+       e:"Biased history doesn't just transfer \u2014 it gets industrialized. The model applies the old bias to every case, fast, with a veneer of objectivity that makes it harder to challenge."}
+    ],
+    fig:{
+      name:"The Improvement Loop",
+      cap:"AI projects don't mature by shipping features \u2014 they mature by getting more accurate. That improvement comes from a cycle that has to keep turning. <strong>Budget for the loop, not just the build.</strong>",
+      svg:`<svg viewBox='0 0 720 210' xmlns='http://www.w3.org/2000/svg'>
+        <defs>
+          <marker id='ah2' viewBox='0 0 10 10' refX='7' refY='5' markerWidth='7' markerHeight='7' orient='auto'>
+            <path d='M0 0 L9 5 L0 10 z' fill='var(--ink-faint)'/>
+          </marker>
+        </defs>
+        <g font-family='Hanken Grotesk,sans-serif'>
+          ${["Collect","Train","Evaluate","Correct","Retrain"].map((lbl,i)=>{
+            const x=[15,156.5,298,439.5,581][i], cx=x+62;
+            return `<rect x='${x}' y='18' width='124' height='66' rx='10' fill='var(--paper-2)' stroke='var(--line)'/>
+              <circle cx='${cx}' cy='40' r='11' fill='var(--rust)'/>
+              <text x='${cx}' y='44' text-anchor='middle' fill='var(--paper-3)' font-size='11' font-weight='700'>${i+1}</text>
+              <text x='${cx}' y='68' text-anchor='middle' fill='var(--ink)' font-size='12.5' font-weight='600'>${lbl}</text>`;
+          }).join("")}
+          ${[147.75,289.25,430.75,572.25].map(x=>`<path d='M${x-7} 51 l10 0' stroke='var(--ink-faint)' stroke-width='2' marker-end='url(#ah2)'/>`).join("")}
+          <path d='M643 84 C643 140 643 150 360 150 C90 150 77 140 77 90' fill='none' stroke='var(--gold)' stroke-width='2.5' stroke-dasharray='2 5' stroke-linecap='round' marker-end='url(#ah2)'/>
+          <rect x='214' y='138' width='292' height='24' rx='12' fill='var(--paper-3)' stroke='var(--line)'/>
+          <text x='360' y='154' text-anchor='middle' fill='var(--ink-soft)' font-size='11' font-style='italic' font-family='Fraunces,serif'>The loop never stops \u2014 an un-retrained model decays</text>
+          <text x='360' y='190' text-anchor='middle' fill='var(--ink-faint)' font-size='10.5'>More &amp; better data in &rarr; more accuracy out. The deliverable stays fixed; the quality climbs.</text>
+        </g>
+      </svg>`
+    },
+    reflect:"Which dataset in your world is cleanest and best-labeled \u2014 core policy data, or the operational data coming out of a BPO relationship? What would a data-readiness check reveal about it?"
+  },
+
+  {
+    id:"m3", track:"Operations",
+    title:"Process Optimization",
+    sub:"AI lets organizations rethink core processes, not just speed up existing ones. The skill is assessing processes well and sequencing change into a roadmap people can actually follow.",
+    why:"This is your team's home turf \u2014 PMO, process engineering, automation. The risk isn't capability; it's <em>triage</em>. Choosing which processes get AI, which get RPA, which go to a BPO partner, and which get left alone is the decision that makes or breaks the portfolio.",
+    sections:[
+      {h:"Optimize vs. rethink",
+       b:["There are two moves available. <strong>Optimizing</strong> takes an existing process and makes it faster, cheaper, or more accurate \u2014 the steps stay roughly the same. <strong>Rethinking</strong> asks whether the process should exist in its current form at all, given what AI now makes possible.",
+          "Most transformation teams default to optimizing because it's safer and easier to scope. But the largest gains \u2014 and the ones executives remember \u2014 usually come from a willingness to rethink. Knowing which mode a process deserves is a judgment call you should make deliberately, not by default."]},
+      {h:"Rapid process assessment",
+       b:["You don't need a six-month study to find AI candidates. A rapid assessment looks for a few signals: <strong>high volume</strong> (the math works), <strong>repeatability</strong> (consistent enough to learn from), <strong>clear inputs and outputs</strong>, <strong>judgment that's pattern-based rather than principle-based</strong>, and <strong>a measurable pain point</strong> \u2014 cost, cycle time, error rate, or customer friction.",
+          "Score processes quickly against those signals and you get a ranked shortlist in days, not quarters. The goal is to <em>pinpoint</em>, not to boil the ocean."]},
+      {h:"Readiness is broader than data",
+       b:["A process can be a great AI candidate and still not be ready. Readiness has four legs: <strong>data</strong> (covered in the last module), <strong>technology</strong> (can it integrate with what you have?), <strong>people</strong> (will the people doing the work adopt it, or route around it?), and <strong>governance</strong> (who approves, monitors, and is accountable?).",
+          "A readiness gap isn't a reason to abandon a project \u2014 it's the work that has to happen first. Naming the gap is more useful than pretending it isn't there."]},
+      {h:"Building an AI roadmap",
+       b:["A roadmap aligns the organization on three things: the <strong>vision</strong> (where this is going and why), the <strong>goals</strong> (what success looks like, in measurable terms), and the <strong>milestones</strong> (the sequence \u2014 what comes first, what it unlocks, what depends on what).",
+          "Good roadmaps sequence for <em>learning and momentum</em>, not just value. An early, lower-stakes win that builds organizational confidence and proves the operating model is often worth more than a larger project that stalls in complexity."]}
+    ],
+    concepts:[
+      {t:"Process optimization",d:"Making an existing process faster, cheaper, or more accurate \u2014 steps stay broadly the same."},
+      {t:"Process rethinking",d:"Asking whether the process should exist in its current form at all, given what AI enables."},
+      {t:"Rapid process assessment",d:"A fast scoring of processes against AI-fit signals to produce a ranked shortlist."},
+      {t:"Readiness gap",d:"A missing piece \u2014 data, tech, people, or governance \u2014 that must be closed before a project can succeed."},
+      {t:"AI roadmap",d:"Shared alignment on vision, measurable goals, and a sequenced set of milestones."},
+      {t:"Sequencing for momentum",d:"Ordering work so early wins build the confidence and operating model later work depends on."}
+    ],
+    apply:{h:"Your triage framework",
+      p:["Build a standing triage rubric for incoming process ideas with four lanes: <strong>AI</strong>, <strong>RPA / rules automation</strong>, <strong>route to a BPO partner</strong>, and <strong>leave it / redesign manually</strong>. Most ideas resolve to the middle two \u2014 and that's a feature, not a failure.",
+         "When you build your innovation function's first roadmap, resist front-loading the most ambitious rethink. Sequence a credible early win that proves your operating model. Momentum is a resource, and early roadmaps spend or build it."]},
+    quiz:[
+      {q:"A claims intake step is high-volume, repetitive, and the judgment involved is pattern-based. It's also drowning the team in cycle time. This is best described as:",
+       o:["A poor AI candidate \u2014 too operational","A strong AI candidate that a rapid assessment would surface","Something only a full six-month study could evaluate","A process to leave untouched"],
+       a:1,
+       e:"High volume, repeatability, pattern-based judgment, and a measurable pain point are exactly the signals a rapid assessment looks for. You don't need a long study to flag it as a strong candidate."},
+      {q:"A process scores well on AI-fit but the people doing the work are likely to route around any tool imposed on them. The right read is:",
+       o:["Cancel it \u2014 it will never work","Force adoption through mandate","It has a people-readiness gap; closing that gap is the first phase of the project","Ignore adoption and focus on the model"],
+       a:2,
+       e:"A readiness gap isn't a kill signal \u2014 it's scoped work. People-readiness is one of the four legs of readiness, and a tool people route around delivers nothing regardless of how good the model is."},
+      {q:"When sequencing a first AI roadmap, why might a smaller early win beat a larger flagship project?",
+       o:["Smaller projects are always more valuable","An early win builds confidence and proves the operating model that later, bigger work depends on","Executives don't care about big projects","Larger projects never deliver value"],
+       a:1,
+       e:"Roadmaps should sequence for learning and momentum, not just raw value. A credible early win establishes the operating model and organizational confidence that ambitious later work relies on."}
+    ],
+    fig:{
+      name:"The Four-Lane Triage",
+      cap:"Every incoming \u201cAI idea\u201d resolves into one of four lanes \u2014 and most land in the middle two. <strong>Routing ideas correctly is the decision that makes or breaks the portfolio.</strong>",
+      svg:`<svg viewBox='0 0 720 252' xmlns='http://www.w3.org/2000/svg' font-family='Hanken Grotesk,sans-serif'>
+        <rect x='240' y='8' width='240' height='34' rx='17' fill='var(--ink)'/>
+        <text x='360' y='30' text-anchor='middle' fill='var(--paper-3)' font-size='12.5' font-weight='600'>Incoming process idea</text>
+        ${[93,271,449,627].map(cx=>`<path d='M360 42 C360 58 ${cx} 58 ${cx} 76' fill='none' stroke='var(--line)' stroke-width='2'/>`).join("")}
+        ${[
+          {x:6,c:"var(--rust)",t:"Build with AI",d1:"Real pattern-based",d2:"judgment at volume.",q1:"Is the data",q2:"actually ready?"},
+          {x:184,c:"var(--forest)",t:"RPA / Rules",d1:"Repetitive, rule-",d2:"driven, no judgment.",q1:"Already covered by",q2:"existing automation?"},
+          {x:362,c:"var(--gold)",t:"BPO Partner",d1:"Scales better with",d2:"a partner's model.",q1:"Is this core to our",q2:"own advantage?"},
+          {x:540,c:"#8B8270",t:"Redesign / Leave",d1:"The process itself",d2:"is the problem.",q1:"Should this exist",q2:"as-is at all?"}
+        ].map(L=>{
+          const ix=L.x+16, cx=L.x+87;
+          return `<rect x='${L.x}' y='80' width='174' height='164' rx='10' fill='var(--paper-2)' stroke='var(--line)'/>
+            <path d='M${L.x} 90 a10 10 0 0 1 10 -10 h154 a10 10 0 0 1 10 10 v18 H${L.x} Z' fill='${L.c}'/>
+            <text x='${cx}' y='100' text-anchor='middle' fill='var(--paper-3)' font-size='12.5' font-weight='700'>${L.t}</text>
+            <text x='${ix}' y='130' fill='var(--ink-2)' font-size='11'><tspan x='${ix}'>${L.d1}</tspan><tspan x='${ix}' dy='14'>${L.d2}</tspan></text>
+            <line x1='${ix}' y1='160' x2='${L.x+158}' y2='160' stroke='var(--line)'/>
+            <text x='${ix}' y='180' fill='${L.c}' font-size='8.5' font-weight='700' letter-spacing='.09em'>ASK FIRST</text>
+            <text x='${ix}' y='197' fill='var(--ink-soft)' font-size='10.5'><tspan x='${ix}'>${L.q1}</tspan><tspan x='${ix}' dy='13'>${L.q2}</tspan></text>`;
+        }).join("")}
+      </svg>`
+    },
+    reflect:"Take the top three process ideas currently on your radar. Which lane does each truly belong in \u2014 AI, RPA, BPO, or redesign? Where were you about to put AI on something that's really one of the other three?"
+  },
+
+  {
+    id:"m4", track:"Customer",
+    title:"AI for Customer Service & Experience",
+    sub:"Great service has always been expensive, which is why most service is mediocre. AI can break that cost-quality tradeoff \u2014 but only where you'd actually want it to.",
+    why:"You manage BPO relationships, much of it customer-facing, for a company serving the military community. Trust is the brand. The question isn't \u201ccan AI handle this contact?\u201d \u2014 it's \u201cshould it, given who we serve?\u201d",
+    sections:[
+      {h:"The tradeoff AI can break",
+       b:["Truly excellent customer service is labor-intensive, and labor is expensive \u2014 so most organizations settle for \u201cgood enough,\u201d and customers feel it. AI's real promise here is breaking that tradeoff: raising the floor on quality <em>and</em> consistency while lowering cost per contact.",
+          "But \u201ccan\u201d is not \u201cshould.\u201d For some contacts \u2014 a grieving beneficiary, a complex annuity decision \u2014 the human touch isn't inefficiency to be optimized away. It's the product. The skill is drawing that line on purpose."]},
+      {h:"Chatbots and smarter answers",
+       b:["Two distinct things often get lumped together. <strong>Chatbots</strong> handle conversational, transactional requests. <strong>Retrieval-based answers</strong> \u2014 AI that searches your real knowledge base and answers from it \u2014 are about giving accurate responses fast, whether to a customer directly or to an agent assisting one.",
+          "Agent-assist (AI helping a human, not replacing them) is frequently the highest-return, lowest-risk starting point. The customer still gets a person; the person gets faster, more consistent answers."]},
+      {h:"Social listening and brand health",
+       b:["AI can monitor social and public channels at a scale no team could, surfacing shifts in sentiment early enough to act \u2014 effectively a leading indicator of brand health. It turns scattered public signal into something you can see a trend in before it shows up in churn or complaint volume."]},
+      {h:"Journeys and the privacy constraint",
+       b:["AI helps map and improve <strong>customer journeys</strong> \u2014 finding the friction points where customers drop, repeat themselves, or escalate. Fixing journey friction often beats optimizing any single contact.",
+          "All of this runs into <strong>data privacy regulation</strong>, which shapes what customer data you can collect, keep, and use. In a regulated, trust-centered business, privacy isn't a constraint bolted on at the end \u2014 it's a design input from the first sketch."]}
+    ],
+    concepts:[
+      {t:"Cost-quality tradeoff",d:"Good service costs more; AI's promise is raising quality and consistency while lowering cost."},
+      {t:"Agent-assist",d:"AI supporting a human agent rather than replacing them \u2014 often the highest-return, lowest-risk start."},
+      {t:"Retrieval-based answers",d:"AI that answers from your actual knowledge base, improving speed and accuracy."},
+      {t:"Social listening",d:"Monitoring public channels at scale to detect sentiment shifts as a leading brand-health signal."},
+      {t:"Journey friction",d:"The points where customers drop, repeat themselves, or escalate \u2014 high-value targets to fix."},
+      {t:"Privacy by design",d:"Treating data privacy as an input from the start, not a compliance check at the end."}
+    ],
+    apply:{h:"Drawing the line for your BPO work",
+      p:["Map your customer-facing BPO contact types on two axes: <strong>emotional weight</strong> and <strong>complexity</strong>. Low-low contacts are the natural home for automation and chatbots. High-emotion contacts \u2014 bereavement, hardship, major life decisions \u2014 stay human, and you can say so confidently because it's a deliberate choice, not a capability gap.",
+         "For the broad middle, agent-assist is your wedge: it improves consistency and cost without removing the person your members expect when they call. Start there before anything customer-facing runs fully autonomous."]},
+    quiz:[
+      {q:"For a company serving the military community, the right framing for AI in customer service is:",
+       o:["Automate every contact to cut cost","Never use AI in customer-facing work","Deliberately decide which contacts AI should handle and which stay human","Let the BPO partner decide case by case"],
+       a:2,
+       e:"\u2018Can\u2019 is not \u2018should.\u2019 In a trust-centered business the human touch is the product for some contacts. The skill is drawing that line on purpose \u2014 not maximizing automation, and not refusing it wholesale."},
+      {q:"Which is typically the highest-return, lowest-risk way to introduce AI into customer service?",
+       o:["A fully autonomous customer-facing chatbot","Agent-assist \u2014 AI helping the human give faster, more consistent answers","Replacing the knowledge base entirely","Social listening only"],
+       a:1,
+       e:"Agent-assist keeps a person in front of the customer while improving speed and consistency behind them. It captures real value with far less risk than fully autonomous customer-facing automation."},
+      {q:"In a regulated, trust-centered business, data privacy should be treated as:",
+       o:["A compliance review at the end of the project","A design input considered from the first sketch","The BPO vendor's responsibility","A constraint only legal needs to think about"],
+       a:1,
+       e:"Privacy by design means privacy shapes the solution from the start. Bolting it on at the end forces expensive rework and risks building something you can't actually deploy."}
+    ],
+    fig:{
+      name:"The Service Decision Matrix",
+      cap:"Plot each customer-facing contact type by complexity and emotional weight. <strong>The human touch isn't inefficiency to optimize away \u2014 for high-emotion contacts, it's the product.</strong> Drawing the line is a deliberate choice, not a capability gap.",
+      svg:`<svg viewBox='0 0 720 312' xmlns='http://www.w3.org/2000/svg' font-family='Hanken Grotesk,sans-serif'>
+        <rect x='120' y='16' width='250' height='124' fill='var(--forest)' fill-opacity='0.13'/>
+        <rect x='370' y='16' width='250' height='124' fill='var(--forest)' fill-opacity='0.22'/>
+        <rect x='120' y='140' width='250' height='124' fill='var(--rust)' fill-opacity='0.13'/>
+        <rect x='370' y='140' width='250' height='124' fill='var(--gold)' fill-opacity='0.18'/>
+        <rect x='120' y='16' width='500' height='248' fill='none' stroke='var(--line)' stroke-width='1.5'/>
+        <line x1='370' y1='16' x2='370' y2='264' stroke='var(--line)' stroke-width='1.5'/>
+        <line x1='120' y1='140' x2='620' y2='140' stroke='var(--line)' stroke-width='1.5'/>
+        <text x='245' y='72' text-anchor='middle' fill='var(--forest)' font-size='13.5' font-weight='700'>Keep human</text>
+        <text x='245' y='92' text-anchor='middle' fill='var(--ink-soft)' font-size='10.5'>simple, but emotionally weighty</text>
+        <text x='495' y='72' text-anchor='middle' fill='var(--forest)' font-size='13.5' font-weight='700'>Keep human \u2014 specialist</text>
+        <text x='495' y='92' text-anchor='middle' fill='var(--ink-soft)' font-size='10.5'>complex and high-stakes</text>
+        <text x='245' y='196' text-anchor='middle' fill='var(--rust)' font-size='13.5' font-weight='700'>Automate / chatbot</text>
+        <text x='245' y='216' text-anchor='middle' fill='var(--ink-soft)' font-size='10.5'>routine, transactional, low-stakes</text>
+        <text x='495' y='196' text-anchor='middle' fill='#9a7416' font-size='13.5' font-weight='700'>Agent-assist</text>
+        <text x='495' y='216' text-anchor='middle' fill='var(--ink-soft)' font-size='10.5'>AI speeds the human, who stays in front</text>
+        <text x='106' y='140' transform='rotate(-90 106 140)' text-anchor='middle' fill='var(--ink)' font-size='10.5' font-weight='700' letter-spacing='.05em'>EMOTIONAL WEIGHT &rarr;</text>
+        <path d='M114 264 l0 -248' stroke='var(--ink-faint)' stroke-width='1.5' marker-end='url(#ah4)'/>
+        <text x='370' y='292' text-anchor='middle' fill='var(--ink)' font-size='10.5' font-weight='700' letter-spacing='.05em'>COMPLEXITY &rarr;</text>
+        <path d='M120 272 l500 0' stroke='var(--ink-faint)' stroke-width='1.5' marker-end='url(#ah4)'/>
+        <defs><marker id='ah4' viewBox='0 0 10 10' refX='7' refY='5' markerWidth='7' markerHeight='7' orient='auto'><path d='M0 0 L9 5 L0 10 z' fill='var(--ink-faint)'/></marker></defs>
+      </svg>`
+    },
+    reflect:"List your three highest-volume customer-facing BPO contact types. For each, where does it sit on emotional weight and complexity \u2014 and what's the honest call: automate, agent-assist, or keep fully human?"
+  },
+
+  {
+    id:"m5", track:"Customer",
+    title:"AI in Marketing & Sales",
+    sub:"AI is already automating sales and marketing tasks that once needed a person. Used well, it finds your best customers and the right message for each \u2014 within the limits your industry imposes.",
+    why:"Life and annuity is a considered, regulated purchase \u2014 not an impulse buy. That changes how propensity modeling and personalization apply, and where the compliance guardrails sit. Knowing both keeps an innovation idea from dying in legal review.",
+    sections:[
+      {h:"Finding your best customers",
+       b:["AI is strong at <strong>propensity modeling</strong> \u2014 scoring which prospects or existing members are most likely to need, qualify for, or respond to a given product. Instead of treating the whole base the same, you focus effort where it's most likely to land.",
+          "In an L&A context this isn't about pressure selling; it's about getting the right protection conversation to the household that actually needs it, at the moment it's relevant \u2014 a life event, a coverage gap, a milestone."]},
+      {h:"The reality of personalization",
+       b:["\u201cPersonalization\u201d is oversold. The reality is more modest and more useful: AI helps tailor <strong>message, timing, and channel</strong> to segments and, increasingly, individuals. It's not mind-reading; it's better matching.",
+          "The failure mode is creepy or tone-deaf personalization that erodes trust faster than generic messaging ever would. In a relationship-based business, restraint is part of the strategy."]},
+      {h:"Right message, right channel",
+       b:["AI helps identify which message resonates with which customer across channels, and which channel each customer actually pays attention to. The same offer can succeed or fail purely on framing and venue. Testing and learning this systematically \u2014 rather than by gut \u2014 is where AI earns its place."]},
+      {h:"Selecting tools and implementing",
+       b:["Leading organizations don't choose marketing AI tools by feature list. They choose by <strong>fit</strong>: does it integrate with our data and systems, does it respect our regulatory constraints, can our people actually run it, and is the vendor stable?",
+          "Implementation is a process, not a purchase: connect the data, define the use case narrowly, prove it on a segment, measure against a real baseline, then scale. The same discipline you'd apply to any process change applies here."]}
+    ],
+    concepts:[
+      {t:"Propensity modeling",d:"Scoring which customers are most likely to need or respond to a product, so effort is focused."},
+      {t:"Personalization (realistic)",d:"Better matching of message, timing, and channel \u2014 not mind-reading. Restraint protects trust."},
+      {t:"Message-channel fit",d:"The same offer can win or lose on framing and venue; AI helps learn this systematically."},
+      {t:"Tool selection by fit",d:"Choosing AI tools on integration, compliance fit, usability, and vendor stability \u2014 not features."},
+      {t:"Baseline measurement",d:"A real \u2018before\u2019 number, without which you can't prove the AI changed anything."},
+      {t:"Narrow use case",d:"Defining a tightly-scoped first application so results are clear and attributable."}
+    ],
+    apply:{h:"Where compliance meets innovation",
+      p:["For any marketing or sales AI idea, run it past two filters early: the <strong>fit filter</strong> (data, integration, usability, vendor) and the <strong>compliance filter</strong> (suitability, fair treatment, disclosure, data use). An idea that can't survive compliance review isn't an innovation \u2014 it's a delay.",
+         "Your partnerships lens is an asset here. Many marketing AI capabilities will arrive through partners or vendors, not internal builds. Apply the same selection-by-fit discipline you already use for BPO partners."]},
+    quiz:[
+      {q:"In a life & annuity context, the best use of propensity modeling is:",
+       o:["Pressuring the whole base to buy more","Getting the right protection conversation to the household that genuinely needs it, when it's relevant","Replacing agents entirely","Ignoring life events as signals"],
+       a:1,
+       e:"Propensity modeling focuses effort where it's most relevant. In a considered, regulated purchase that means matching the right conversation to real need and timing \u2014 not maximizing contact volume."},
+      {q:"What's the realistic description of what AI personalization delivers?",
+       o:["It reads customers' minds","It perfectly predicts every individual decision","Better matching of message, timing, and channel \u2014 with restraint to protect trust","It eliminates the need for segmentation"],
+       a:2,
+       e:"Personalization is oversold. The useful, honest version is better matching \u2014 and in a relationship business, knowing when not to personalize matters as much as the technique itself."},
+      {q:"An exciting marketing AI idea is unlikely to survive compliance review. The most useful move is to:",
+       o:["Build it anyway and deal with compliance later","Drop the idea entirely and don't revisit it","Apply the compliance filter early, before investment, and reshape or shelve accordingly","Let the vendor handle compliance"],
+       a:2,
+       e:"Running the compliance filter early prevents sunk-cost investment in something that can't deploy. It's not about killing ideas \u2014 it's about reshaping them before they cost real money, or shelving them with clear eyes."}
+    ],
+    fig:{
+      name:"The Two-Filter Funnel",
+      cap:"Run every marketing or sales AI idea through two filters early, before investment. <strong>An idea that can't survive compliance review isn't an innovation \u2014 it's a delay.</strong> Filtering early reshapes ideas while it's still cheap.",
+      svg:`<svg viewBox='0 0 720 232' xmlns='http://www.w3.org/2000/svg' font-family='Hanken Grotesk,sans-serif'>
+        <defs><marker id='ah5' viewBox='0 0 10 10' refX='7' refY='5' markerWidth='8' markerHeight='8' orient='auto'><path d='M0 0 L9 5 L0 10 z' fill='var(--ink-faint)'/></marker></defs>
+        <rect x='8' y='52' width='96' height='52' rx='12' fill='var(--ink)'/>
+        <text x='56' y='75' text-anchor='middle' fill='var(--paper-3)' font-size='12.5' font-weight='600'>AI idea</text>
+        <text x='56' y='92' text-anchor='middle' fill='#b5ad99' font-size='9.5'>on the table</text>
+        <path d='M108 78 l28 0' stroke='var(--ink-faint)' stroke-width='2.5' marker-end='url(#ah5)'/>
+        <rect x='150' y='34' width='196' height='90' rx='12' fill='var(--paper-2)' stroke='var(--forest)' stroke-width='1.5'/>
+        <text x='248' y='56' text-anchor='middle' fill='var(--forest)' font-size='11.5' font-weight='700' letter-spacing='.06em'>FIT FILTER</text>
+        <text x='248' y='78' text-anchor='middle' fill='var(--ink-2)' font-size='10.5'>data &middot; integration</text>
+        <text x='248' y='94' text-anchor='middle' fill='var(--ink-2)' font-size='10.5'>usability &middot; vendor stability</text>
+        <text x='248' y='113' text-anchor='middle' fill='var(--ink-faint)' font-size='9' font-style='italic'>can we actually run it?</text>
+        <path d='M350 78 l28 0' stroke='var(--ink-faint)' stroke-width='2.5' marker-end='url(#ah5)'/>
+        <rect x='392' y='34' width='196' height='90' rx='12' fill='var(--paper-2)' stroke='var(--rust)' stroke-width='1.5'/>
+        <text x='490' y='56' text-anchor='middle' fill='var(--rust)' font-size='11.5' font-weight='700' letter-spacing='.06em'>COMPLIANCE FILTER</text>
+        <text x='490' y='78' text-anchor='middle' fill='var(--ink-2)' font-size='10.5'>suitability &middot; fair treatment</text>
+        <text x='490' y='94' text-anchor='middle' fill='var(--ink-2)' font-size='10.5'>disclosure &middot; data use</text>
+        <text x='490' y='113' text-anchor='middle' fill='var(--ink-faint)' font-size='9' font-style='italic'>can it actually deploy?</text>
+        <path d='M592 78 l28 0' stroke='var(--ink-faint)' stroke-width='2.5' marker-end='url(#ah5)'/>
+        <rect x='624' y='52' width='90' height='52' rx='12' fill='var(--rust)'/>
+        <text x='669' y='75' text-anchor='middle' fill='var(--paper-3)' font-size='12' font-weight='600'>Launch-</text>
+        <text x='669' y='91' text-anchor='middle' fill='var(--paper-3)' font-size='12' font-weight='600'>ready</text>
+        <path d='M248 124 l0 30' stroke='var(--ink-faint)' stroke-width='1.5' stroke-dasharray='2 4' marker-end='url(#ah5)'/>
+        <path d='M490 124 l0 30' stroke='var(--ink-faint)' stroke-width='1.5' stroke-dasharray='2 4' marker-end='url(#ah5)'/>
+        <rect x='150' y='162' width='438' height='40' rx='10' fill='var(--paper-3)' stroke='var(--line)'/>
+        <text x='369' y='180' text-anchor='middle' fill='var(--ink)' font-size='11' font-weight='600'>Fails a filter? Reshape it or shelve it \u2014 with clear eyes.</text>
+        <text x='369' y='195' text-anchor='middle' fill='var(--ink-soft)' font-size='9.5'>Cheap now. Expensive after the build.</text>
+      </svg>`
+    },
+    reflect:"Think of one marketing or sales improvement AI could enable in your business. Run it through the fit filter and the compliance filter right now \u2014 where does it get stronger, and where does it get stuck?"
+  },
+
+  {
+    id:"m6", track:"Operations",
+    title:"AI in Finance",
+    sub:"AI won't replace finance professionals, but it will change how all of them work. Six finance use cases show where the transformation is already happening.",
+    why:"Your transformation team includes a forecasting function, and you manage BPO contracts with real cost dynamics. This module is the most directly operational one for you \u2014 it maps straight onto work already on your team's plate.",
+    sections:[
+      {h:"How the finance role is shifting",
+       b:["Recent AI advances have made the technology's power obvious even to non-technical professionals. The change in finance isn't replacement \u2014 it's <strong>reallocation</strong>: less time on assembling and reconciling, more time on interpretation, judgment, and advising the business.",
+          "The finance professional who thrives is the one who lets AI take the mechanical load and reinvests that time in the parts of the role that need a human \u2014 context, skepticism, and a point of view."]},
+      {h:"Six places AI is changing finance work",
+       b:["Across the finance function, AI tends to show up in six recurring use cases: <strong>forecasting and planning</strong> (better, faster, more scenario-rich projections); <strong>anomaly and fraud detection</strong> (spotting the transaction that doesn't fit); <strong>close and reconciliation</strong> (compressing the mechanical month-end work); <strong>accounts payable / receivable</strong> (automating matching and routing); <strong>reporting and narrative</strong> (drafting the commentary that explains the numbers); and <strong>scenario and decision support</strong> (modeling \u2018what if\u2019 quickly enough to actually inform a decision)."]},
+      {h:"The technologies behind them",
+       b:["These use cases lean on the families from Module 1 in predictable ways. <strong>ML</strong> drives forecasting and anomaly detection \u2014 pattern problems with history. <strong>Generative AI</strong> drives reporting narrative and explanation. <strong>Automation</strong> (often rules-based) handles the high-volume matching in AP/AR. Knowing which technology sits behind a use case tells you how to scope, staff, and govern it."]},
+      {h:"Applying it to the major processes",
+       b:["The pattern for putting AI into a finance process is the same discipline as any process change: start with the process that has volume and a measurable pain point, confirm the data is ready, prove it narrowly, measure against a baseline, then scale. Forecasting is often the highest-visibility starting point because its output is something executives already look at \u2014 improvement is immediately legible."]}
+    ],
+    concepts:[
+      {t:"Reallocation, not replacement",d:"AI shifts finance time from assembling and reconciling toward interpretation and judgment."},
+      {t:"AI-assisted forecasting",d:"Faster, more scenario-rich projections \u2014 a high-visibility, executive-legible starting point."},
+      {t:"Anomaly detection",d:"ML spotting the transaction or pattern that doesn't fit the historical norm."},
+      {t:"Close automation",d:"Compressing the mechanical month-end reconciliation and matching work."},
+      {t:"Narrative generation",d:"Generative AI drafting the commentary that explains the numbers, for human review."},
+      {t:"Scenario support",d:"Modeling \u2018what if\u2019 fast enough to actually inform a live decision."}
+    ],
+    apply:{h:"For your forecasting function and BPO economics",
+      p:["AI-assisted forecasting is a natural early flagship for your innovation function: the output is already on executive desks, so any improvement in speed, accuracy, or scenario depth is immediately visible. It's a credibility win in a place that's hard to argue with.",
+         "On the BPO side, anomaly detection and AP/AR automation map onto the cost and invoice dynamics of your partner contracts. Watch the cost line specifically \u2014 the recurring transformation trap is automation that doesn't cover its own development cost. Pick finance use cases where the baseline pain is large enough that the math clearly works."]},
+    quiz:[
+      {q:"The most accurate description of AI's effect on the finance role is:",
+       o:["It replaces most finance professionals","It reallocates time from assembling and reconciling toward interpretation and judgment","It eliminates the need for forecasting","It only matters for large enterprises"],
+       a:1,
+       e:"AI takes the mechanical load and frees finance professionals to spend more time on context, skepticism, and advising the business. The role changes; it doesn't disappear."},
+      {q:"Why is forecasting often a strong first AI use case in finance?",
+       o:["It needs no data","Its output is already something executives look at, so improvement is immediately legible","It's the easiest to build technically","It carries no risk"],
+       a:1,
+       e:"A flagship use case wins partly on visibility. Forecasting output already lands on executive desks, so gains in speed, accuracy, or scenario depth are obvious without needing to be explained."},
+      {q:"When choosing a finance AI use case, the recurring transformation trap to watch for is:",
+       o:["Using too much data","Automation whose value doesn't cover its own development and run cost","Involving finance professionals too early","Measuring against a baseline"],
+       a:1,
+       e:"Plenty of automations are technically successful and economically pointless. Choosing use cases where the baseline pain is large enough that the math clearly works is what keeps the portfolio honest."}
+    ],
+    fig:{
+      name:"Six Finance Use Cases \u00d7 Three Tech Families",
+      cap:"AI shows up in finance in six recurring places \u2014 each powered by a family from Module 1. <strong>Knowing which family sits behind a use case tells you how to scope, staff, and govern it.</strong>",
+      svg:`<svg viewBox='0 0 720 296' xmlns='http://www.w3.org/2000/svg' font-family='Hanken Grotesk,sans-serif'>
+        <g>
+          <rect x='6' y='10' width='13' height='13' rx='3' fill='var(--forest)'/>
+          <text x='25' y='21' fill='var(--ink-soft)' font-size='10.5'>Machine Learning</text>
+          <rect x='150' y='10' width='13' height='13' rx='3' fill='var(--gold)'/>
+          <text x='169' y='21' fill='var(--ink-soft)' font-size='10.5'>Generative AI</text>
+          <rect x='280' y='10' width='13' height='13' rx='3' fill='#8B8270'/>
+          <text x='299' y='21' fill='var(--ink-soft)' font-size='10.5'>Automation</text>
+        </g>
+        ${[
+          {t1:"Forecasting",t2:"& planning",fam:"ML",c:"var(--forest)"},
+          {t1:"Anomaly &",t2:"fraud detection",fam:"ML",c:"var(--forest)"},
+          {t1:"Close &",t2:"reconciliation",fam:"AUTOMATION",c:"#8B8270"},
+          {t1:"AP / AR",t2:"matching & routing",fam:"AUTOMATION",c:"#8B8270"},
+          {t1:"Reporting &",t2:"narrative",fam:"GENERATIVE",c:"var(--gold)"},
+          {t1:"Scenario &",t2:"decision support",fam:"ML + GEN",c:"var(--rust)"}
+        ].map((u,i)=>{
+          const col=i%3, row=Math.floor(i/3);
+          const x=[6,246,486][col], y=[40,166][row];
+          return `<rect x='${x}' y='${y}' width='228' height='112' rx='10' fill='var(--paper-2)' stroke='var(--line)'/>
+            <rect x='${x}' y='${y}' width='5' height='112' rx='2.5' fill='${u.c}'/>
+            <text x='${x+22}' y='${y+38}' fill='var(--ink)' font-size='15' font-weight='600' font-family='Fraunces,serif'>${u.t1}</text>
+            <text x='${x+22}' y='${y+58}' fill='var(--ink)' font-size='15' font-weight='600' font-family='Fraunces,serif'>${u.t2}</text>
+            <rect x='${x+22}' y='${y+74}' width='${u.fam.length*6.6+20}' height='20' rx='10' fill='${u.c}' fill-opacity='0.16'/>
+            <text x='${x+32}' y='${y+88}' fill='${u.c}' font-size='9.5' font-weight='700' letter-spacing='.06em'>${u.fam}</text>`;
+        }).join("")}
+        <text x='360' y='290' text-anchor='middle' fill='var(--ink-faint)' font-size='10.5' font-style='italic' font-family='Fraunces,serif'>Forecasting is often the strongest first flagship \u2014 its output is already on executive desks.</text>
+      </svg>`
+    },
+    reflect:"Of the six finance use cases, which one has both the clearest pain point and the most executive visibility in your organization? What would a narrow first proof of it look like?"
+  },
+
+  {
+    id:"m7", track:"Value",
+    title:"The ROI of AI",
+    sub:"\u201cIf you can't measure it, you can't manage it.\u201d This module gets past the hype to the actual returns \u2014 who's winning, who isn't, and the path between.",
+    why:"This is the module your role lives or dies on. If your innovation function can't show return, it gets defunded \u2014 and the recurring trap of automation that doesn't cover its own cost is exactly the failure mode this discipline prevents.",
+    sections:[
+      {h:"Past the hype, to results",
+       b:["The honest picture of AI ROI is uneven. Some organizations are seeing real, compounding returns. Many are stuck in expensive experimentation with little to show. The difference is rarely the technology \u2014 it's almost always the discipline around it.",
+          "Drucker's line is the whole module: <strong>if you can't measure it, you can't manage it.</strong> An AI initiative without a baseline and a defined metric isn't an investment \u2014 it's a hope."]},
+      {h:"Who wins, who doesn't, and why",
+       b:["The <strong>winners</strong> share a pattern: a clearly defined use case tied to a business outcome, data that was actually ready, real adoption by the people doing the work, and a measured baseline they improved against.",
+          "The <strong>losers</strong> also share a pattern: technology-first thinking (\u201cwe need an AI strategy\u201d with no specific problem), no baseline, weak adoption, and vague success criteria that can't be evaluated. The cause of failure is almost never \u2018the AI wasn't good enough.\u2019"]},
+      {h:"The pitfalls to avoid",
+       b:["A few traps recur. <strong>Pilot purgatory</strong> \u2014 endless pilots that never scale or get killed. <strong>No baseline</strong> \u2014 you improved something, but you can't prove it. <strong>Ignoring change cost</strong> \u2014 the model was cheap; the adoption, training, and process rework were not, and nobody budgeted for them. <strong>Vanity metrics</strong> \u2014 measuring activity (\u2018prompts run\u2019) instead of outcome (\u2018cost or cycle time reduced\u2019)."]},
+      {h:"Six steps to a real ROI",
+       b:["A workable path: <strong>(1)</strong> define the business problem and the outcome metric; <strong>(2)</strong> establish the baseline before you touch anything; <strong>(3)</strong> estimate full cost \u2014 build, run, <em>and</em> change; <strong>(4)</strong> prove it narrowly and measure against the baseline; <strong>(5)</strong> account for adoption as part of the result, not an afterthought; <strong>(6)</strong> scale only what cleared the bar, and keep measuring.",
+          "Notice that only one of the six steps is about building. ROI is mostly a framing and measurement discipline \u2014 which is good news, because that's a transformation-team competency, not an engineering one."]}
+    ],
+    concepts:[
+      {t:"Baseline",d:"The measured \u2018before\u2019 state. Without it, you can't prove the AI changed anything."},
+      {t:"Pilot purgatory",d:"Endless pilots that never scale and never get killed \u2014 cost with no resolution."},
+      {t:"Full cost",d:"Build + run + change. The model is often the cheapest part; adoption and rework aren't."},
+      {t:"Vanity metric",d:"Measuring activity instead of outcome \u2014 \u2018prompts run\u2019 rather than \u2018cost reduced.\u2019"},
+      {t:"Adoption as result",d:"Treating whether people actually use the tool as part of the ROI, not an afterthought."},
+      {t:"Outcome metric",d:"The specific business measure \u2014 cost, cycle time, error rate \u2014 the initiative is judged on."}
+    ],
+    apply:{h:"The discipline that protects your function",
+      p:["Make the six-step path the standing gate for every initiative in your innovation portfolio. The non-negotiable steps are <strong>baseline before you start</strong> and <strong>full cost including change</strong> \u2014 those two alone prevent most of the failure modes.",
+         "You've seen the trap directly: automations that don't cover their development cost. The fix is structural, not heroic \u2014 a portfolio-level ROI gate means a weak idea fails the gate instead of failing in production. Build the gate before you build the pipeline."]},
+    quiz:[
+      {q:"Across organizations, the main thing separating AI ROI winners from losers is:",
+       o:["Access to better models","Larger budgets","Discipline \u2014 defined use case, ready data, real adoption, measured baseline","Hiring more data scientists"],
+       a:2,
+       e:"The cause of AI failure is almost never \u2018the technology wasn't good enough.\u2019 Winners share a discipline pattern; losers share a no-discipline pattern. That's the lever you actually control."},
+      {q:"An initiative cut processing time, but leadership questions whether it really helped. The most likely root cause is:",
+       o:["The model was too advanced","No baseline was established before the change, so improvement can't be proven","Too many people were trained","The use case was too narrow"],
+       a:1,
+       e:"Without a measured \u2018before,\u2019 you can claim improvement but not demonstrate it. Establishing the baseline before touching the process is step two of the six for exactly this reason."},
+      {q:"When estimating the cost of an AI initiative, the most commonly underestimated component is:",
+       o:["The cost of the model itself","The cost of change \u2014 adoption, training, and process rework","The cost of storage","The cost of the kickoff meeting"],
+       a:1,
+       e:"The model is often the cheapest part. Change cost \u2014 getting people to actually adopt it and reworking the surrounding process \u2014 is routinely left out of the math, which is how \u2018successful\u2019 projects fail to pay for themselves."}
+    ],
+    fig:{
+      name:"Six Steps to a Real ROI",
+      cap:"Only one of the six steps is about building. <strong>ROI is mostly a framing and measurement discipline \u2014 which is a transformation-team competency, not an engineering one.</strong> The non-negotiables: a baseline before you start, and full cost including change.",
+      svg:`<svg viewBox='0 0 720 274' xmlns='http://www.w3.org/2000/svg' font-family='Hanken Grotesk,sans-serif'>
+        <defs><marker id='ah7' viewBox='0 0 10 10' refX='7' refY='5' markerWidth='7' markerHeight='7' orient='auto'><path d='M0 0 L9 5 L0 10 z' fill='var(--ink-faint)'/></marker></defs>
+        ${[
+          {n:1,x:12,y:30,t1:"Define the problem",t2:"& outcome metric",hl:false},
+          {n:2,x:258,y:30,t1:"Establish the baseline",t2:"before you touch it",hl:false},
+          {n:3,x:504,y:30,t1:"Estimate full cost:",t2:"build + run + change",hl:false},
+          {n:4,x:504,y:158,t1:"Prove it narrowly,",t2:"measured vs. baseline",hl:true},
+          {n:5,x:258,y:158,t1:"Count adoption as",t2:"part of the result",hl:false},
+          {n:6,x:12,y:158,t1:"Scale only what cleared",t2:"\u2014 and keep measuring",hl:false}
+        ].map(s=>{
+          const stroke=s.hl?"var(--rust)":"var(--line)", sw=s.hl?"2":"1.2";
+          const badge=s.hl?"var(--rust)":"var(--ink)";
+          return `<rect x='${s.x}' y='${s.y}' width='204' height='86' rx='11' fill='${s.hl?"var(--paper-3)":"var(--paper-2)"}' stroke='${stroke}' stroke-width='${sw}'/>
+            <circle cx='${s.x+30}' cy='${s.y+30}' r='15' fill='${badge}'/>
+            <text x='${s.x+30}' y='${s.y+35}' text-anchor='middle' fill='var(--paper-3)' font-size='14' font-weight='700' font-family='Fraunces,serif'>${s.n}</text>
+            <text x='${s.x+54}' y='${s.y+27}' fill='var(--ink)' font-size='11.5' font-weight='600'>${s.t1}</text>
+            <text x='${s.x+54}' y='${s.y+43}' fill='var(--ink-soft)' font-size='11'>${s.t2}</text>
+            ${s.hl?`<rect x='${s.x+18}' y='${s.y+58}' width='150' height='18' rx='9' fill='var(--rust)'/><text x='${s.x+93}' y='${s.y+71}' text-anchor='middle' fill='var(--paper-3)' font-size='8.5' font-weight='700' letter-spacing='.07em'>THE ONLY BUILD STEP</text>`:""}`;
+        }).join("")}
+        <path d='M216 73 l30 0' stroke='var(--ink-faint)' stroke-width='2' marker-end='url(#ah7)'/>
+        <path d='M462 73 l30 0' stroke='var(--ink-faint)' stroke-width='2' marker-end='url(#ah7)'/>
+        <path d='M606 116 C606 138 606 140 606 156' stroke='var(--ink-faint)' stroke-width='2' marker-end='url(#ah7)'/>
+        <path d='M504 201 l-30 0' stroke='var(--ink-faint)' stroke-width='2' marker-end='url(#ah7)'/>
+        <path d='M258 201 l-30 0' stroke='var(--ink-faint)' stroke-width='2' marker-end='url(#ah7)'/>
+        <text x='360' y='262' text-anchor='middle' fill='var(--ink-faint)' font-size='10.5' font-style='italic' font-family='Fraunces,serif'>A portfolio-level gate means a weak idea fails the gate \u2014 instead of failing in production.</text>
+      </svg>`
+    },
+    reflect:"Pick one current or planned initiative in your world. Does it have a real baseline? Has full cost \u2014 including change \u2014 been estimated? If either answer is no, what's the smallest step to fix that this week?"
+  },
+
+  {
+    id:"m8", track:"Value",
+    title:"Ethics in AI",
+    sub:"AI's advances come bundled with hard questions \u2014 business, legal, and ethical. There are no easy answers, but they can't be ignored.",
+    why:"You operate in a heavily regulated industry, serving a community whose trust is the entire value proposition. Bias and error in an AI system aren't abstract here \u2014 they're legal exposure, regulatory risk, and reputational damage at the same time.",
+    sections:[
+      {h:"Why ethics is a business discipline, not a side topic",
+       b:["It's tempting to treat AI ethics as a philosophical add-on. In a regulated financial business it's nothing of the sort \u2014 it's <strong>risk management</strong>. An AI system that treats customers unfairly, or that nobody can explain, is a live legal, regulatory, and reputational liability.",
+          "The organizations that handle this well don't bolt ethics on at the end. They build it into how decisions get evaluated \u2014 the same way you'd build in financial controls."]},
+      {h:"Bias and computational error",
+       b:["Two distinct failure modes. <strong>Bias</strong> is when the system systematically treats some groups differently \u2014 usually because it learned from historical data that already encoded that difference (see Module 2). <strong>Computational error</strong> is when the system is simply, confidently wrong in ways that are hard to catch because the output <em>looks</em> authoritative.",
+          "Both are dangerous precisely because AI operates at scale and with an air of objectivity. A biased human decision affects one case; a biased model affects every case, fast, while looking neutral."]},
+      {h:"Evaluating AI business decisions",
+       b:["A practical lens for any AI decision: <strong>Is it fair</strong> \u2014 across the groups it affects? <strong>Is it explainable</strong> \u2014 can you tell a customer or a regulator <em>why</em>? <strong>Is it accountable</strong> \u2014 is there a named human owner when it goes wrong? <strong>Is it transparent</strong> \u2014 do the people affected know AI is involved?",
+          "These aren't yes/no checkboxes. They're questions that should be asked early and revisited, with honest answers \u2014 \u2018we don't know yet\u2019 being a legitimate and important answer."]},
+      {h:"Living with hard questions",
+       b:["The module's honest position: there is no easy answer to most AI ethics questions, and pretending otherwise is its own failure. The goal isn't a perfect rulebook \u2014 it's an organization that <em>asks the questions deliberately</em>, documents its reasoning, and is willing to revisit decisions as it learns. Ignoring the questions doesn't make them go away; it just means someone else \u2014 a regulator, a journalist, a harmed customer \u2014 asks them for you, later, on worse terms."]}
+    ],
+    concepts:[
+      {t:"Ethics as risk management",d:"In regulated finance, AI ethics is operational risk \u2014 legal, regulatory, reputational \u2014 not philosophy."},
+      {t:"Algorithmic bias",d:"Systematic unequal treatment, usually learned from history that already encoded that inequality."},
+      {t:"Confident error",d:"AI being plainly wrong while the output looks authoritative \u2014 hard to catch, easy to trust."},
+      {t:"Explainability",d:"Being able to tell a customer or regulator why a decision was made."},
+      {t:"Accountability",d:"A named human owner who is responsible when an AI system goes wrong."},
+      {t:"Deliberate questioning",d:"Asking the fairness/explainability/accountability questions early and revisiting them honestly."}
+    ],
+    apply:{h:"Bake it into your governance",
+      p:["Add a short ethics review to your innovation function's intake gate \u2014 four questions: fair, explainable, accountable, transparent. It costs minutes per idea and catches problems while they're still cheap to fix.",
+         "For anything that touches underwriting, pricing, suitability, or claims, treat the bar as high by default, and make \u2018we don't know yet\u2019 a valid gate answer that triggers more work rather than a rubber stamp. In your industry, the cost of asking these questions late is measured in regulatory findings and lost trust \u2014 both far more expensive than the review."]},
+    quiz:[
+      {q:"In a regulated financial business, AI ethics is best understood as:",
+       o:["A philosophical topic separate from operations","A form of operational risk management \u2014 legal, regulatory, and reputational","Only relevant to the legal department","A compliance formality with no real stakes"],
+       a:1,
+       e:"An unfair or unexplainable AI system is a live liability. Treating ethics as risk management \u2014 built into how decisions are evaluated \u2014 is what keeps it from becoming a regulatory finding later."},
+      {q:"Why is algorithmic bias more dangerous than an individual biased decision?",
+       o:["It's slower","It applies at scale, fast, with an appearance of objectivity that's hard to challenge","It only affects one case","It's easier to detect"],
+       a:1,
+       e:"A biased human decision affects one case. A biased model industrializes the bias \u2014 every case, fast, wrapped in a veneer of neutrality that makes it harder to question."},
+      {q:"In an ethics review, a team answers \u201cwe don't know yet\u201d to whether a model is fair across affected groups. The right response is:",
+       o:["Treat it as a pass and move on","Treat it as a fail and kill the project","Treat it as a valid answer that triggers more work before proceeding","Ignore the question"],
+       a:2,
+       e:"\u2018We don't know yet\u2019 is legitimate and important \u2014 it's neither a rubber stamp nor an automatic kill. It should trigger the work needed to actually answer the question before the system moves forward."}
+    ],
+    fig:{
+      name:"The Four-Question Ethics Gate",
+      cap:"Every AI decision passes four checkpoints. <strong>\u201cWe don't know yet\u201d is a legitimate answer \u2014 it triggers more work, never a rubber stamp.</strong> The cost of asking these late is measured in regulatory findings and lost trust.",
+      svg:`<svg viewBox='0 0 720 226' xmlns='http://www.w3.org/2000/svg' font-family='Hanken Grotesk,sans-serif'>
+        <defs><marker id='ah8' viewBox='0 0 10 10' refX='7' refY='5' markerWidth='7' markerHeight='7' orient='auto'><path d='M0 0 L9 5 L0 10 z' fill='var(--ink-faint)'/></marker></defs>
+        <rect x='8' y='40' width='86' height='58' rx='12' fill='var(--ink)'/>
+        <text x='51' y='66' text-anchor='middle' fill='var(--paper-3)' font-size='11.5' font-weight='600'>AI</text>
+        <text x='51' y='82' text-anchor='middle' fill='var(--paper-3)' font-size='11.5' font-weight='600'>decision</text>
+        ${[
+          {x:106,c:"var(--rust)",q:"Fair?",s1:"across every",s2:"affected group"},
+          {x:232,c:"var(--forest)",q:"Explainable?",s1:"to a customer",s2:"or a regulator"},
+          {x:358,c:"var(--gold)",q:"Accountable?",s1:"a named human",s2:"owner when it fails"},
+          {x:484,c:"#8B8270",q:"Transparent?",s1:"people know",s2:"AI is involved"}
+        ].map((g,i)=>{
+          const cx=g.x+58;
+          return `<rect x='${g.x}' y='14' width='116' height='110' rx='10' fill='var(--paper-2)' stroke='var(--line)'/>
+            <path d='M${g.x} 24 a10 10 0 0 1 10 -10 h96 a10 10 0 0 1 10 10 v14 H${g.x} Z' fill='${g.c}'/>
+            <text x='${cx}' y='31' text-anchor='middle' fill='var(--paper-3)' font-size='8' font-weight='700' letter-spacing='.12em'>CHECK ${i+1}</text>
+            <text x='${cx}' y='66' text-anchor='middle' fill='var(--ink)' font-size='15' font-weight='600' font-family='Fraunces,serif'>${g.q}</text>
+            <text x='${cx}' y='90' text-anchor='middle' fill='var(--ink-soft)' font-size='10'>${g.s1}</text>
+            <text x='${cx}' y='104' text-anchor='middle' fill='var(--ink-soft)' font-size='10'>${g.s2}</text>
+            ${i<3?`<path d='M${g.x+116} 69 l10 0' stroke='var(--ink-faint)' stroke-width='2' marker-end='url(#ah8)'/>`:""}`;
+        }).join("")}
+        <path d='M600 69 l12 0' stroke='var(--ink-faint)' stroke-width='2' marker-end='url(#ah8)'/>
+        <rect x='620' y='40' width='92' height='58' rx='12' fill='var(--forest)'/>
+        <text x='666' y='64' text-anchor='middle' fill='var(--paper-3)' font-size='11' font-weight='600'>Cleared</text>
+        <text x='666' y='80' text-anchor='middle' fill='var(--paper-3)' font-size='11' font-weight='600'>to proceed</text>
+        <rect x='8' y='148' width='704' height='58' rx='12' fill='var(--paper-3)' stroke='var(--gold)' stroke-width='1.5'/>
+        <text x='360' y='172' text-anchor='middle' fill='var(--ink)' font-size='12.5' font-weight='700'>Any \u201cwe don't know yet\u201d \u2014 the gate holds.</text>
+        <text x='360' y='191' text-anchor='middle' fill='var(--ink-soft)' font-size='11'>It is not a fail and not a pass. It triggers the work needed to actually answer the question.</text>
+      </svg>`
+    },
+    reflect:"Think of an AI use case in your portfolio that touches underwriting, pricing, suitability, or claims. Walk it through the four questions \u2014 fair, explainable, accountable, transparent. Which one are you least able to answer right now?"
+  },
+
+  {
+    id:"m9", track:"Future",
+    title:"The Future of Work in an AI-Accelerated World",
+    sub:"AI is reshaping the careers we pursue, the coworkers we collaborate with, and the competencies we need. New careers, new coworkers, new competencies.",
+    why:"Building an innovation function <em>is</em> workforce transformation. You're not just adopting tools \u2014 you're changing what your colleagues do all day and what skills they need. This module is the conceptual backbone of that work.",
+    sections:[
+      {h:"New careers, new coworkers, new competencies",
+       b:["The future-of-work shift organizes into three parts. <strong>New careers</strong> \u2014 roles that didn't exist, and existing roles redefined around what AI can now do. <strong>New coworkers</strong> \u2014 AI systems as collaborators in the daily flow of work, not just tools you occasionally pick up. <strong>New competencies</strong> \u2014 the mix of digital and human skills people need to stay effective.",
+          "For someone standing up an innovation function, this is the operating frame: you're managing all three shifts at once, for a population of colleagues who didn't sign up for them."]},
+      {h:"The four roles AI plays",
+       b:["AI shows up in your work in four distinct modes. As an <strong>assistant</strong> (does tasks you direct). As an <strong>advisor</strong> (offers analysis and options for your judgment). As an <strong>automator</strong> (runs defined work without you). As an <strong>agent</strong> (pursues goals across steps with autonomy).",
+          "Most anxiety and most mismanagement come from confusing these. Treating an assistant like an agent over-trusts it; treating an agent like an assistant wastes it. Naming which role AI is playing in a given workflow is a clarifying habit worth teaching your whole team."]},
+      {h:"Myths, mindset, and new expectations",
+       b:["Common myths \u2014 AI will replace everyone, or AI changes nothing \u2014 are both wrong and both paralyzing. The reality is <strong>augmentation</strong>: AI changes the <em>composition</em> of most jobs rather than eliminating them outright.",
+          "That creates new employer expectations: comfort working alongside AI, judgment about when to trust it, and a willingness to keep relearning. The required <strong>mindset shift</strong> is from \u2018I know how to do my job\u2019 to \u2018I know how to keep redefining my job.\u2019"]},
+      {h:"Essential skills \u2014 digital and human",
+       b:["The durable skill set is a pairing. <strong>Digital skills</strong>: working effectively with AI tools, framing problems for them, judging their output. <strong>Human skills</strong>: judgment, communication, ethical reasoning, relationship-building, sense-making \u2014 the things that get <em>more</em> valuable as the mechanical work gets automated.",
+          "And a special note on the <strong>future of AI itself</strong>: roughly ten trajectories will shape its evolution over the next five years. You don't need to predict them precisely \u2014 you need an organization built to keep adapting as they unfold."]}
+    ],
+    concepts:[
+      {t:"New careers / coworkers / competencies",d:"The three-part frame for how AI reshapes work \u2014 roles, collaborators, and skills."},
+      {t:"AI as assistant",d:"Does tasks you direct. Over-trusting it like an agent is a common error."},
+      {t:"AI as advisor",d:"Offers analysis and options for your judgment to act on."},
+      {t:"AI as automator",d:"Runs defined work without ongoing direction."},
+      {t:"AI as agent",d:"Pursues goals across multiple steps with autonomy \u2014 the mode needing the most guardrails."},
+      {t:"Augmentation",d:"AI changing the composition of jobs rather than eliminating them outright."},
+      {t:"Digital + human skills",d:"Working well with AI, paired with judgment and communication that grow more valuable."},
+      {t:"Adaptive mindset",d:"Shifting from \u2018I know my job\u2019 to \u2018I know how to keep redefining my job.\u2019"}
+    ],
+    apply:{h:"This is your innovation function's real product",
+      p:["Your hackathons and literacy efforts aren't side activities \u2014 they're the delivery mechanism for the three shifts. Frame them that way to executives: you're not running events, you're building an adaptive workforce.",
+         "Teach the four roles of AI explicitly. A shared vocabulary for \u2018is this an assistant or an agent?\u2019 reduces both the over-trust that causes incidents and the under-use that wastes the investment. And design your function for continuous adaptation \u2014 the ten trajectories ahead mean a one-time training program ages out fast; a learning operating model doesn't."]},
+    quiz:[
+      {q:"A colleague treats an autonomous agentic AI the same way they'd treat a simple assistant. The risk is:",
+       o:["Nothing \u2014 they're interchangeable","Over-trust \u2014 granting autonomy and acting on output without the oversight an agent requires","The AI will run too slowly","Under-use of the assistant"],
+       a:1,
+       e:"The four roles aren't interchangeable. Treating an agent like an assistant means under-supervising something that acts on its own \u2014 exactly where guardrails matter most."},
+      {q:"The most accurate view of AI's effect on most jobs is:",
+       o:["It eliminates them outright","It changes nothing meaningful","It augments them \u2014 changing the composition of the work rather than removing the job","It only affects entry-level roles"],
+       a:2,
+       e:"Both \u2018replaces everyone\u2019 and \u2018changes nothing\u2019 are paralyzing myths. Augmentation \u2014 a shift in what the job is made of \u2014 is the realistic and actionable middle."},
+      {q:"For an innovation function, the best framing of AI literacy programs to executives is:",
+       o:["Optional enrichment events","The delivery mechanism for workforce transformation \u2014 building an adaptive workforce","A cost center with no measurable return","A one-time project that ends when training is done"],
+       a:1,
+       e:"Literacy work is how the new-careers/coworkers/competencies shifts actually reach people. Framed as building an adaptive workforce \u2014 not running events \u2014 it reads as strategy, not overhead."}
+    ],
+    fig:{
+      name:"The Four Roles of AI",
+      cap:"AI shows up in four distinct modes. <strong>Most mismanagement comes from confusing them</strong> \u2014 treating an agent like an assistant under-supervises it; treating an assistant like an agent over-trusts it. Naming the role is a clarifying habit worth teaching the whole team.",
+      svg:`<svg viewBox='0 0 720 238' xmlns='http://www.w3.org/2000/svg' font-family='Hanken Grotesk,sans-serif'>
+        <defs><marker id='ah9' viewBox='0 0 10 10' refX='7' refY='5' markerWidth='8' markerHeight='8' orient='auto'><path d='M0 0 L9 5 L0 10 z' fill='var(--rust)'/></marker></defs>
+        ${[
+          {x:6,c:"#8B8270",t:"Assistant",d1:"Does tasks",d2:"you direct",p1:"Step-by-step",p2:"direction"},
+          {x:184,c:"var(--forest)",t:"Advisor",d1:"Offers analysis",d2:"& options",p1:"The judgment",p2:"& the decision"},
+          {x:362,c:"var(--gold)",t:"Automator",d1:"Runs defined work",d2:"unattended",p1:"The rules &",p2:"the monitoring"},
+          {x:540,c:"var(--rust)",t:"Agent",d1:"Pursues goals",d2:"across steps",p1:"Goals, limits",p2:"& guardrails"}
+        ].map(r=>{
+          const ix=r.x+16, cx=r.x+87;
+          return `<rect x='${r.x}' y='12' width='174' height='158' rx='10' fill='var(--paper-2)' stroke='var(--line)'/>
+            <path d='M${r.x} 22 a10 10 0 0 1 10 -10 h154 a10 10 0 0 1 10 10 v20 H${r.x} Z' fill='${r.c}'/>
+            <text x='${cx}' y='34' text-anchor='middle' fill='var(--paper-3)' font-size='14' font-weight='700' font-family='Fraunces,serif'>${r.t}</text>
+            <text x='${ix}' y='64' fill='var(--ink-faint)' font-size='8.5' font-weight='700' letter-spacing='.09em'>WHAT IT DOES</text>
+            <text x='${ix}' y='80' fill='var(--ink-2)' font-size='11'><tspan x='${ix}'>${r.d1}</tspan><tspan x='${ix}' dy='13'>${r.d2}</tspan></text>
+            <line x1='${ix}' y1='110' x2='${r.x+158}' y2='110' stroke='var(--line)'/>
+            <text x='${ix}' y='128' fill='var(--ink-faint)' font-size='8.5' font-weight='700' letter-spacing='.09em'>YOU PROVIDE</text>
+            <text x='${ix}' y='144' fill='var(--ink-2)' font-size='11'><tspan x='${ix}'>${r.p1}</tspan><tspan x='${ix}' dy='13'>${r.p2}</tspan></text>`;
+        }).join("")}
+        <line x1='14' y1='196' x2='700' y2='196' stroke='var(--line-soft)' stroke-width='6' stroke-linecap='round'/>
+        <path d='M700 196 l-15 -6 v12 Z' fill='var(--rust)'/>
+        <text x='14' y='222' fill='var(--ink)' font-size='11' font-weight='700' class='fg-t'>INCREASING AUTONOMY</text>
+        <text x='700' y='222' text-anchor='end' fill='var(--rust)' font-size='11' font-weight='700' class='fg-t'>INCREASING NEED FOR GUARDRAILS</text>
+      </svg>`
+    },
+    reflect:"For your own role this year, which of the four AI modes \u2014 assistant, advisor, automator, agent \u2014 are you using most? Which one are you under-using, and what would change if you leaned into it?"
+  },
+
+  {
+    id:"m10", track:"Future",
+    title:"AI for All: Roadmap to Success",
+    sub:"AI projects span a spectrum \u2014 from exploration to disruption. This module ties the course together into a framework for targeting the right problems and measuring success.",
+    why:"This is the synthesis module. Everything you've built \u2014 the AI families, data readiness, process triage, the ROI gate, the ethics review \u2014 comes together into a roadmap for the innovation function you're actually standing up.",
+    sections:[
+      {h:"The spectrum: explore to disrupt",
+       b:["AI projects sit along a spectrum. At one end, <strong>exploration</strong> \u2014 small, low-stakes efforts to learn what's possible and build capability. In the middle, <strong>operationalization</strong> \u2014 putting proven use cases into the real flow of work, and <strong>integration</strong> \u2014 weaving AI into core business strategy. At the far end, <strong>disruption</strong> \u2014 AI reshaping what the business does, not just how it does it.",
+          "A healthy portfolio has work at multiple points on the spectrum. An innovation function that only explores never delivers; one that only operationalizes never learns. You're managing a balance, deliberately."]},
+      {h:"Targeting the right problems",
+       b:["The recurring discipline of the whole course: <strong>start from the problem, not the technology.</strong> The right AI problems have a real, measurable pain point; data that's ready or readyable; a process with enough volume that the math works; and a path to adoption.",
+          "\u2018We need an AI strategy\u2019 is not a problem. \u2018Our intake process has a cycle-time problem that costs us X\u2019 is. The second one can be solved, measured, and defended; the first one becomes pilot purgatory."]},
+      {h:"Measuring success",
+       b:["Success metrics have to be defined <em>before</em> the work, in business terms, against a baseline. The metric depends on where the project sits on the spectrum: an exploration project's success might be \u2018capability built and a clear go/no-go decision reached\u2019; an operationalized project's success is a hard outcome number \u2014 cost, cycle time, error rate, satisfaction.",
+          "Match the metric to the spectrum position. Holding an exploration project to a hard ROI number kills useful learning; letting an operationalized project off with a vanity metric hides real failure."]},
+      {h:"Is generative AI different?",
+       b:["The course's closing question: is GenAI a genuine break, or more of the same? The honest answer is <em>both</em>. The disciplines don't change \u2014 problem-first thinking, data readiness, ROI rigor, ethics, adoption \u2014 all still apply. But GenAI's accessibility and breadth genuinely widen the surface area of what's possible, and lower the barrier to who can build.",
+          "For a transformation leader, that's the synthesis: the fundamentals you've learned in this course are <em>more</em> valuable as the technology accelerates, not less. The tools will keep changing. The discipline is the durable asset \u2014 and it's the one you own."]}
+    ],
+    concepts:[
+      {t:"The AI spectrum",d:"Explore \u2192 operationalize \u2192 integrate \u2192 disrupt. A healthy portfolio spans multiple points."},
+      {t:"Exploration project",d:"Small, low-stakes effort to build capability and learn \u2014 success is a clear go/no-go decision."},
+      {t:"Operationalization",d:"Putting a proven use case into the real flow of work \u2014 success is a hard outcome number."},
+      {t:"Problem-first thinking",d:"Starting from a real, measurable pain point rather than from the technology."},
+      {t:"Metric-to-spectrum fit",d:"Matching the success measure to where the project sits \u2014 learning vs. hard ROI."},
+      {t:"Discipline as durable asset",d:"Tools keep changing; problem-first, ROI, ethics, and adoption rigor stay valuable."}
+    ],
+    apply:{h:"Your innovation function, assembled",
+      p:["You now have the full kit. <strong>Module 1</strong> gives you the triage vocabulary; <strong>2</strong> the data-readiness gate; <strong>3</strong> the process triage lanes; <strong>4\u20136</strong> the use-case landscape across customer, sales, and finance; <strong>7</strong> the ROI gate; <strong>8</strong> the ethics review; <strong>9</strong> the workforce frame; and <strong>10</strong> the spectrum that balances the portfolio.",
+         "Assemble these into one intake-to-scale flow: a triaged idea passes a data-readiness check, gets an ethics review, gets sequenced on the spectrum, runs against a baseline through the ROI gate, and scales only if it clears. That flow \u2014 not any single tool \u2014 is what makes your innovation function defensible. Build the discipline first; the wins follow it."]}
+    ,
+    quiz:[
+      {q:"An innovation function only ever runs small exploratory pilots and never operationalizes anything. The core problem is:",
+       o:["It explores too little","It never delivers \u2014 a healthy portfolio needs work across multiple points on the spectrum","Exploration is always wrong","It should only operationalize"],
+       a:1,
+       e:"Explore-only never delivers; operationalize-only never learns. Managing a deliberate balance across the spectrum is the job \u2014 not living at either extreme."},
+      {q:"Which is a well-targeted AI problem?",
+       o:["\u2018We need an AI strategy\u2019","\u2018Leadership wants us to use more AI\u2019","\u2018Our intake process has a cycle-time problem that costs us a measurable amount\u2019","\u2018Competitors are using AI\u2019"],
+       a:2,
+       e:"Problem-first thinking needs a real, measurable pain point. The intake cycle-time problem can be solved, measured, and defended; the others are technology-first framings that lead to pilot purgatory."},
+      {q:"Holding an early exploration project to a hard ROI number is a mistake because:",
+       o:["Exploration projects can't be measured at all","It kills useful learning \u2014 the metric should match the project's position on the spectrum","ROI never matters","Exploration projects always have high ROI"],
+       a:1,
+       e:"Metric-to-spectrum fit matters in both directions. An exploration project's success is a clear go/no-go decision; demanding hard ROI too early destroys the learning it exists to produce."}
+    ],
+    fig:{
+      name:"The Spectrum & Your Intake-to-Scale Flow",
+      cap:"A healthy portfolio spans the spectrum \u2014 explore-only never delivers, operationalize-only never learns. <strong>The intake-to-scale flow, not any single tool, is what makes your innovation function defensible.</strong>",
+      svg:`<svg viewBox='0 0 720 322' xmlns='http://www.w3.org/2000/svg' font-family='Hanken Grotesk,sans-serif'>
+        <defs><marker id='ah10' viewBox='0 0 10 10' refX='7' refY='5' markerWidth='7' markerHeight='7' orient='auto'><path d='M0 0 L9 5 L0 10 z' fill='var(--ink-faint)'/></marker></defs>
+        <text x='6' y='16' fill='var(--rust)' font-size='10.5' font-weight='700' letter-spacing='.12em'>THE AI SPECTRUM</text>
+        ${[
+          {x:6,c:"var(--forest)",t:"Explore",d:"build capability, learn"},
+          {x:184,c:"#5a6b3f",t:"Operationalize",d:"into the real workflow"},
+          {x:362,c:"var(--gold)",t:"Integrate",d:"into business strategy"},
+          {x:540,c:"var(--rust)",t:"Disrupt",d:"reshape what you do"}
+        ].map((s,i)=>{
+          const cx=s.x+82;
+          return `<path d='M${s.x} 26 h158 l14 30 -14 30 h-158 l${i===0?0:14} -30 z' fill='${s.c}' fill-opacity='0.92'/>
+            <text x='${cx+ (i===0?0:7)}' y='52' text-anchor='middle' fill='var(--paper-3)' font-size='13' font-weight='700' font-family='Fraunces,serif'>${s.t}</text>
+            <text x='${cx+ (i===0?0:7)}' y='68' text-anchor='middle' fill='var(--paper-3)' font-size='9' fill-opacity='0.85'>${s.d}</text>`;
+        }).join("")}
+        <text x='360' y='104' text-anchor='middle' fill='var(--ink-faint)' font-size='10' font-style='italic' font-family='Fraunces,serif'>Match each project's success metric to where it sits \u2014 a learning goal, or a hard ROI number.</text>
+        <line x1='6' y1='124' x2='714' y2='124' stroke='var(--line)'/>
+        <text x='6' y='150' fill='var(--rust)' font-size='10.5' font-weight='700' letter-spacing='.12em'>YOUR INTAKE-TO-SCALE FLOW</text>
+        ${[
+          {t1:"Triage",t2:"4 lanes"},
+          {t1:"Data",t2:"readiness check"},
+          {t1:"Ethics",t2:"4-question gate"},
+          {t1:"Sequence",t2:"on the spectrum"},
+          {t1:"ROI gate",t2:"baseline + cost"},
+          {t1:"Scale",t2:"only if cleared"}
+        ].map((b,i)=>{
+          const x=6+i*119, cx=x+55;
+          return `<rect x='${x}' y='162' width='110' height='74' rx='10' fill='var(--paper-2)' stroke='${i===5?"var(--rust)":"var(--line)"}' stroke-width='${i===5?2:1.2}'/>
+            <circle cx='${x+18}' cy='180' r='10' fill='${i===5?"var(--rust)":"var(--ink)"}'/>
+            <text x='${x+18}' y='184' text-anchor='middle' fill='var(--paper-3)' font-size='10' font-weight='700'>${i+1}</text>
+            <text x='${cx}' y='206' text-anchor='middle' fill='var(--ink)' font-size='12' font-weight='600' font-family='Fraunces,serif'>${b.t1}</text>
+            <text x='${cx}' y='223' text-anchor='middle' fill='var(--ink-soft)' font-size='9.5'>${b.t2}</text>
+            ${i<5?`<path d='M${x+110} 199 l9 0' stroke='var(--ink-faint)' stroke-width='2' marker-end='url(#ah10)'/>`:""}`;
+        }).join("")}
+        <rect x='6' y='258' width='708' height='52' rx='12' fill='var(--forest)'/>
+        <text x='360' y='282' text-anchor='middle' fill='var(--paper-3)' font-size='12' font-weight='700'>An idea only scales if it clears every stage.</text>
+        <text x='360' y='300' text-anchor='middle' fill='#cdd6c4' font-size='10.5'>The tools will keep changing. The discipline is the durable asset \u2014 and it's the one you own.</text>
+      </svg>`
+    },
+    reflect:"Sketch the one-line version of your innovation function's intake-to-scale flow. Which stage \u2014 triage, data check, ethics review, spectrum sequencing, ROI gate \u2014 is currently weakest or missing, and what's your first move to build it?"
+  }
+];
+
+const GLOSSARY = [
+  {t:"Agent (AI as agent)",m:"M9",d:"AI that pursues a goal across multiple steps with autonomy, using tools and making decisions along the way \u2014 the mode that most needs guardrails."},
+  {t:"Agent-assist",m:"M4",d:"AI supporting a human agent rather than replacing them. Often the highest-return, lowest-risk way to introduce AI into customer service."},
+  {t:"Agentic AI",m:"M1",d:"The family of AI that takes multi-step action toward a goal. The newest and most powerful family, and the one most in need of governance."},
+  {t:"Algorithmic bias",m:"M8",d:"When an AI system systematically treats some groups differently, usually because it learned from historical data that already encoded that difference."},
+  {t:"Anomaly detection",m:"M6",d:"Using ML to spot the transaction or pattern that doesn't fit the historical norm \u2014 a core finance and fraud use case."},
+  {t:"Augmentation",m:"M9",d:"AI changing the composition of a job \u2014 what the work is made of \u2014 rather than eliminating the job outright."},
+  {t:"Baseline",m:"M7",d:"The measured \u2018before\u2019 state of a process. Without it, improvement can be claimed but not proven."},
+  {t:"Data drift",m:"M2",d:"When the real world shifts but the data \u2014 and the model trained on it \u2014 doesn't keep up, quietly degrading accuracy."},
+  {t:"Data readiness",m:"M2",d:"Whether data has the volume, quality, labels, access, and representativeness an AI project actually needs."},
+  {t:"Data silo",m:"M2",d:"The same entity represented inconsistently across multiple systems, making it hard to learn from reliably."},
+  {t:"Explainability",m:"M8",d:"Being able to tell a customer or regulator why an AI-influenced decision was made."},
+  {t:"Full cost",m:"M7",d:"Build cost + run cost + change cost. The model is often the cheapest part; adoption and process rework are not."},
+  {t:"Generative AI",m:"M1",d:"The family of AI that creates new content \u2014 text, summaries, drafts. A strong first-drafter and a weak final authority."},
+  {t:"Improvement loop",m:"M2",d:"Collect \u2192 train \u2192 evaluate \u2192 correct \u2192 retrain. The ongoing cycle by which AI gets more accurate over time."},
+  {t:"Labeled data",m:"M2",d:"Past cases where the correct outcome is recorded \u2014 what supervised machine learning models learn from."},
+  {t:"Machine learning",m:"M1",d:"The family of AI that learns patterns from historical data to predict or classify. Needs history and a clear target."},
+  {t:"Pilot purgatory",m:"M7",d:"Endless pilots that never scale and never get killed \u2014 ongoing cost with no resolution or decision."},
+  {t:"Privacy by design",m:"M4",d:"Treating data privacy as a design input from the first sketch, not a compliance check bolted on at the end."},
+  {t:"Problem-first thinking",m:"M10",d:"Starting from a real, measurable business pain point rather than from a desire to use a technology."},
+  {t:"Propensity modeling",m:"M5",d:"Scoring which customers are most likely to need or respond to a product, so effort is focused where it's relevant."},
+  {t:"Rapid process assessment",m:"M3",d:"A fast scoring of processes against AI-fit signals \u2014 volume, repeatability, clear I/O, pattern-based judgment, measurable pain \u2014 to produce a ranked shortlist."},
+  {t:"Readiness gap",m:"M3",d:"A missing piece \u2014 data, technology, people, or governance \u2014 that must be closed before an AI project can succeed."},
+  {t:"Reallocation (finance)",m:"M6",d:"AI shifting finance professionals' time from assembling and reconciling toward interpretation and judgment \u2014 not replacing them."},
+  {t:"Rules-based automation",m:"M1",d:"Automation that follows explicit logic a human wrote. Predictable and auditable, but brittle on anything messy."},
+  {t:"The AI spectrum",m:"M10",d:"Explore \u2192 operationalize \u2192 integrate \u2192 disrupt. A healthy AI portfolio has work at multiple points along it."},
+  {t:"Vanity metric",m:"M7",d:"Measuring activity instead of outcome \u2014 \u2018prompts run\u2019 rather than \u2018cost or cycle time reduced.\u2019"}
+];
+
+const CAPSTONE_STEPS = [
+  {h:"Name the problem, not the technology",
+   p:"Pick one real pain point in your partnerships, BPO, or innovation remit. State it as a measurable problem \u2014 cost, cycle time, error rate, or customer friction \u2014 with no mention of AI.",
+   ph:"The problem I'm targeting, in business terms\u2026"},
+  {h:"Triage it",
+   p:"Which lane does it belong in \u2014 AI, RPA/rules automation, route to a BPO partner, or redesign manually? If AI, which family: ML, generative, or agentic? Be honest if it's really one of the non-AI lanes.",
+   ph:"Lane and AI family (with reasoning)\u2026"},
+  {h:"Check readiness",
+   p:"Run the four legs: data (volume, quality, labels, access, representativeness), technology, people/adoption, governance. Name the biggest readiness gap \u2014 that gap is your real first phase.",
+   ph:"Biggest readiness gap and how I'd close it\u2026"},
+  {h:"Run the ethics review",
+   p:"Four questions: is it fair across affected groups, explainable, accountable (named human owner), and transparent? Note where your honest answer is \u2018we don't know yet\u2019 \u2014 and what work that triggers.",
+   ph:"Ethics review notes \u2014 weakest answer and next step\u2026"},
+  {h:"Define the metric and baseline",
+   p:"What's the outcome metric? What's the baseline today, before you touch anything? What's the full cost \u2014 build, run, and change? If you can't answer the baseline, that's your first task.",
+   ph:"Outcome metric, baseline, and full-cost estimate\u2026"},
+  {h:"Place it on the spectrum and sequence it",
+   p:"Is this an exploration, operationalization, integration, or disruption project? Set a success definition that matches that position. Then write the one-line intake-to-scale flow your innovation function will run every idea through.",
+   ph:"Spectrum position, matched success definition, and my intake-to-scale flow\u2026"}
+];
+
+/* ---- The Operator Track ---- */
+const OP_TARGET_DEFAULT = "I want to become capable of identifying enterprise workflows where AI can create value, designing a practical solution, building or directing a prototype, evaluating its quality, and communicating the business case to executives.";
+
+const OP_GAP_MAP = [
+  {id:"g1", name:"AI fundamentals",
+   learn:"LLMs, agents, context windows, tools, RAG, evals",
+   why:"Know what's possible vs. hype",
+   proof:"Explain AI architecture simply to a non-technical executive"},
+  {id:"g2", name:"Technical fluency",
+   learn:"APIs, Python basics, JSON / YAML, Git, simple app architecture",
+   why:"Work credibly with builders",
+   proof:"Build a small tool / API workflow end to end"},
+  {id:"g3", name:"Agentic systems",
+   learn:"Skills, memory, tools, orchestration, MCP, guardrails",
+   why:"Directly connects to AgentOS",
+   proof:"Make a concrete improvement to your own AgentOS"},
+  {id:"g4", name:"Enterprise deployment",
+   learn:"Security, access, data privacy, compliance, governance",
+   why:"Critical in regulated firms",
+   proof:"Write an enterprise AI risk checklist"},
+  {id:"g5", name:"Workflow redesign",
+   learn:"Process mapping, automation, handoffs, controls",
+   why:"Turns AI into operating value",
+   proof:"Redesign one real workflow with AI in it"},
+  {id:"g6", name:"Product thinking",
+   learn:"Right problem, right user, MVP, timing, wedge",
+   why:"Prevents overbuilding",
+   proof:"A one-page product brief"},
+  {id:"g7", name:"Consulting communication",
+   learn:"Problem framing, options, recommendation, exec story",
+   why:"Makes you promotable",
+   proof:"An executive-ready case study"},
+  {id:"g8", name:"Measurement",
+   learn:"Baseline, success metrics, ROI, adoption, benefits",
+   why:"Moves from idea to value",
+   proof:"A benefits hypothesis and scorecard"}
+];
+
+const OP_LEVELS = ["Aware","Learning","Capable","Fluent"];
+
+const OP_SPRINT = [
+  {wk:1, title:"Baseline & Vocabulary",
+   focus:"Get the language down cold \u2014 you can't direct what you can't name.",
+   tasks:[
+     "Create a one-page glossary covering: API, RAG, agent, tool calling, MCP, eval, embedding, vector database, workflow automation",
+     "Write a plain-language definition of each in your own words \u2014 no jargon recycled",
+     "Quiz yourself at the end of the week \u2014 cover the terms and explain each aloud"
+   ],
+   note:"Which terms still feel fuzzy after the self-quiz?"},
+  {wk:2, title:"Build Something Small",
+   focus:"The goal is not elegance \u2014 it's understanding the moving parts.",
+   tasks:[
+     "Build or direct one simple AI workflow: capture a note \u2192 sort priorities \u2192 create follow-up actions",
+     "Note every component the workflow touches \u2014 input, model, tools, output, storage",
+     "Identify the one part you understood least, and dig into just that"
+   ],
+   note:"What surprised you about how the pieces fit together?"},
+  {wk:3, title:"Enterprise Translation",
+   focus:"Turn capability into something that could survive a regulated firm.",
+   tasks:[
+     "Pick one real enterprise workflow from your partnerships or BPO remit",
+     "Map where AI could help \u2014 and, honestly, where it could fail",
+     "Document what data it needs and what approvals would matter",
+     "Define how value would be measured \u2014 the baseline and the metric"
+   ],
+   note:"Where did the enterprise constraints reshape your first instinct?"},
+  {wk:4, title:"Career-Capital Artifact",
+   focus:"Produce the thing that makes the capability visible to executives.",
+   tasks:[
+     "Draft a short case study \u2014 Problem stated in business terms",
+     "Add the AI-enabled solution and the prototype or concept",
+     "Add the Risks and the Operating model",
+     "Add the Value hypothesis and the Next decision needed"
+   ],
+   note:"What's the single next decision this artifact should put in front of a leader?"}
+];
+
+const OP_QUIZ_QS = [
+  "What did I learn this week?",
+  "What can I now explain to a non-technical executive?",
+  "What can I now build or direct?",
+  "What concept still feels fuzzy?",
+  "What did I apply to real work?",
+  "What proof point did I create?"
+];
+
+const OP_ARTIFACT = [
+  {id:"understand", h:"What I need to understand",
+   p:"The concepts, architectures, and vocabulary you must hold confidently \u2014 so you can tell possibility from hype. Pull from your gap map: AI fundamentals, agentic systems, enterprise deployment.",
+   ph:"List what you need to understand \u2014 and your honest current level on each\u2026"},
+  {id:"build", h:"What I need to be able to build",
+   p:"The things you must be able to build or credibly direct \u2014 small tools, workflows, prototypes. This is what separates an operator from a commentator.",
+   ph:"List what you need to be able to build or direct \u2014 and your first practice target\u2026"},
+  {id:"explain", h:"What I need to be able to explain to executives",
+   p:"The framing, options, recommendation, and business story. This is the career-capital layer \u2014 the part that makes the capability visible and makes you promotable.",
+   ph:"List what you need to be able to explain \u2014 and to whom (Rob, the Advisory Council\u2026)\u2026"}
+];
+
+/* ============================================================
+   STATE + PERSISTENCE
+   ------------------------------------------------------------
+   Layered persistence so progress survives in BOTH contexts:
+     1. window.storage  \u2014 Claude.ai artifact viewer
+     2. localStorage    \u2014 downloaded / standalone HTML file
+     3. in-memory       \u2014 last resort (session only)
+   ============================================================ */
+const STORAGE_KEY = "ai-mini-mba-progress-v1";
+
+const Persist = (function(){
+  // tier 1: Claude artifact storage
+  const hasWS = (typeof window !== "undefined" && window.storage
+                 && typeof window.storage.get === "function"
+                 && typeof window.storage.set === "function");
+  // tier 2: real browser localStorage \u2014 verified with a live write/read test
+  let hasLS = false;
+  try{
+    const k = "__mba_probe__";
+    window.localStorage.setItem(k, "1");
+    hasLS = (window.localStorage.getItem(k) === "1");
+    window.localStorage.removeItem(k);
+  }catch(e){ hasLS = false; }
+
+  let mode = hasWS ? "window-storage" : (hasLS ? "local-storage" : "memory");
+
+  async function load(){
+    try{
+      if(mode === "window-storage"){
+        const res = await window.storage.get(STORAGE_KEY, false);
+        return (res && res.value) ? res.value : null;
+      }
+      if(mode === "local-storage"){
+        return window.localStorage.getItem(STORAGE_KEY);
+      }
+    }catch(e){
+      // tier-1 read failed at runtime \u2014 drop to localStorage if we can
+      if(mode === "window-storage" && hasLS){
+        mode = "local-storage";
+        try{ return window.localStorage.getItem(STORAGE_KEY); }catch(e2){}
+      }
+    }
+    return null;
+  }
+
+  async function save(str){
+    try{
+      if(mode === "window-storage"){ await window.storage.set(STORAGE_KEY, str, false); return true; }
+      if(mode === "local-storage"){ window.localStorage.setItem(STORAGE_KEY, str); return true; }
+    }catch(e){
+      // tier-1 write failed at runtime \u2014 fall back to localStorage
+      if(mode === "window-storage" && hasLS){
+        mode = "local-storage";
+        try{ window.localStorage.setItem(STORAGE_KEY, str); return true; }catch(e2){}
+      }
+    }
+    return false;
+  }
+
+  async function clear(){
+    try{ if(hasWS) await window.storage.delete(STORAGE_KEY, false); }catch(e){}
+    try{ if(hasLS) window.localStorage.removeItem(STORAGE_KEY); }catch(e){}
+  }
+
+  return {
+    get mode(){ return mode; },
+    get persistent(){ return mode !== "memory"; },
+    load, save, clear
+  };
+})();
+
+let state = {
+  view: "overview",            // 'overview' | moduleId | 'glossary' | 'capstone' | 'op-gapmap' | 'op-sprint' | 'op-quiz'
+  progress: {},                // moduleId -> {completed, quizAnswers:{}, notes}
+  capstone: {},                // stepIndex -> text
+  operator: {                  // The Operator Track
+    target: "",                // personalized target capability
+    gap: {},                   // gapId -> {level:0-4, note:""}
+    sprint: {},                // "w{n}t{i}" -> bool ; "w{n}note" -> text
+    quiz: {},                  // "w{n}q{i}" -> text
+    artifact: {}               // artifactId -> text
+  }
+};
+COURSE.forEach(m => state.progress[m.id] = {completed:false, quizAnswers:{}, notes:""});
+OP_GAP_MAP.forEach(g => state.operator.gap[g.id] = {level:0, note:""});
+
+async function loadState(){
+  let raw = null;
+  try{ raw = await Persist.load(); }catch(e){ raw = null; }
+  if(!raw) return;
+  try{
+    const saved = JSON.parse(raw);
+    if(saved.progress){
+      COURSE.forEach(m=>{
+        if(saved.progress[m.id]){
+          state.progress[m.id] = {
+            completed: !!saved.progress[m.id].completed,
+            quizAnswers: saved.progress[m.id].quizAnswers || {},
+            notes: saved.progress[m.id].notes || ""
+          };
+        }
+      });
+    }
+    if(saved.capstone) state.capstone = saved.capstone;
+    if(saved.operator){
+      const o = saved.operator;
+      state.operator.target = o.target || "";
+      if(o.gap){
+        OP_GAP_MAP.forEach(g=>{
+          if(o.gap[g.id]) state.operator.gap[g.id] = {
+            level: o.gap[g.id].level || 0,
+            note: o.gap[g.id].note || ""
+          };
+        });
+      }
+      state.operator.sprint = o.sprint || {};
+      state.operator.quiz = o.quiz || {};
+      state.operator.artifact = o.artifact || {};
+    }
+    if(saved.view) state.view = saved.view;
+  }catch(e){ /* corrupt or empty payload \u2014 start fresh */ }
+}
+
+let saveTimer = null;
+function saveState(){
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(()=>{
+    const payload = JSON.stringify({
+      progress: state.progress, capstone: state.capstone,
+      operator: state.operator, view: state.view
+    });
+    Persist.save(payload);
+  }, 350);
+}
+
+/* ============================================================
+   HELPERS
+   ============================================================ */
+const $ = sel => document.querySelector(sel);
+const moduleIndex = id => COURSE.findIndex(m=>m.id===id);
+const completedCount = () => COURSE.filter(m=>state.progress[m.id].completed).length;
+const allDone = () => completedCount() === COURSE.length;
+function esc(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");}
+const gapRatedCount = () => OP_GAP_MAP.filter(g=>state.operator.gap[g.id].level>0).length;
+const sprintTotal = () => OP_SPRINT.reduce((n,w)=>n+w.tasks.length,0);
+const sprintDoneCount = () => {
+  let n=0;
+  OP_SPRINT.forEach(w=>w.tasks.forEach((t,i)=>{ if(state.operator.sprint["w"+w.wk+"t"+i]) n++; }));
+  return n;
+};
+
+/* ============================================================
+   RENDER: SIDEBAR
+   ============================================================ */
+function renderSidebar(){
+  const done = completedCount();
+  const pct = Math.round(done/COURSE.length*100);
+  $("#progPct").textContent = pct + "%";
+  $("#progBar").style.width = pct + "%";
+
+  let html = "";
+  // overview
+  html += navItemHTML("overview", "Course Overview", "Start here", null, state.view==="overview", false);
+
+  // grouped modules
+  let lastTrack = null;
+  COURSE.forEach((m, i)=>{
+    if(m.track !== lastTrack){
+      html += `<div class="sb-section-label">${esc(m.track)}</div>`;
+      lastTrack = m.track;
+    }
+    const p = state.progress[m.id];
+    html += navItemHTML(m.id, m.title, "Module " + (i+1), p.completed, state.view===m.id, false, i+1);
+  });
+
+  // operator track
+  html += `<div class="sb-section-label">The Operator Track</div>`;
+  html += navItemHTML("op-gapmap", "Target & Gap Map", gapRatedCount()+" of 8 rated", null, state.view==="op-gapmap", false);
+  html += navItemHTML("op-sprint", "30-Day Sprint", sprintDoneCount()+" of "+sprintTotal()+" tasks", null, state.view==="op-sprint", false);
+  html += navItemHTML("op-quiz", "Quiz & Career Artifact", "Reflect &amp; ship", null, state.view==="op-quiz", false);
+
+  // extras
+  html += `<div class="sb-section-label">Reference</div>`;
+  html += navItemHTML("glossary", "Glossary", "26 key terms", null, state.view==="glossary", false);
+  html += navItemHTML("capstone", "Capstone Worksheet", allDone()?"Unlocked":"Finish all modules", null, state.view==="capstone", !allDone());
+
+  $("#nav").innerHTML = html;
+
+  $("#nav").querySelectorAll(".navitem").forEach(el=>{
+    if(el.classList.contains("locked")) return;
+    el.addEventListener("click", ()=>{
+      go(el.dataset.view);
+      closeMobileNav();
+    });
+  });
+}
+
+function navItemHTML(view, name, sub, completed, active, locked, num){
+  let dot;
+  if(completed===true) dot = `<span class="ni-dot done"></span>`;
+  else if(num) dot = `<span class="ni-dot"><span>${num}</span></span>`;
+  else if(view==="overview") dot = `<span class="ni-dot"><span>&#9733;</span></span>`;
+  else if(view==="glossary") dot = `<span class="ni-dot"><span>&#9776;</span></span>`;
+  else if(view&&view.indexOf("op-")===0) dot = `<span class="ni-dot"><span>&#9650;</span></span>`;
+  else dot = `<span class="ni-dot"><span>${locked?"&#128274;":"&#9670;"}</span></span>`;
+  return `<button class="navitem ${active?"active":""} ${locked?"locked":""}" data-view="${view}">
+    ${dot}
+    <span class="ni-text">
+      <span class="ni-name">${esc(name)}</span>
+      <span class="ni-sub">${esc(sub)}</span>
+    </span>
+  </button>`;
+}
+
+/* ============================================================
+   RENDER: ROUTER
+   ============================================================ */
+function go(view){
+  state.view = view;
+  saveState();
+  renderSidebar();
+  renderStage();
+  $("#main").scrollTop = 0;
+}
+
+function renderStage(){
+  const stage = $("#stage");
+  if(state.view === "overview") stage.innerHTML = overviewHTML();
+  else if(state.view === "glossary") stage.innerHTML = glossaryHTML();
+  else if(state.view === "capstone") stage.innerHTML = capstoneHTML();
+  else if(state.view === "op-gapmap") stage.innerHTML = opGapMapHTML();
+  else if(state.view === "op-sprint") stage.innerHTML = opSprintHTML();
+  else if(state.view === "op-quiz") stage.innerHTML = opQuizHTML();
+  else stage.innerHTML = moduleHTML(state.view);
+  wireStage();
+}
+
+/* ============================================================
+   RENDER: OVERVIEW
+   ============================================================ */
+function overviewHTML(){
+  const done = completedCount();
+  let cards = "";
+  COURSE.forEach((m,i)=>{
+    const p = state.progress[m.id];
+    cards += `<button class="ov-card" data-goto="${m.id}">
+      <span class="ov-num">${String(i+1).padStart(2,"0")}</span>
+      <span class="ov-cbody">
+        <span class="ov-cname">${esc(m.title)}</span>
+        <span class="ov-cdesc">${esc(m.sub)}</span>
+      </span>
+      <span class="ov-cmeta">
+        <span class="ov-pill ${p.completed?"done":"todo"}">${p.completed?"Complete":m.track}</span>
+      </span>
+    </button>`;
+  });
+
+  // find first incomplete for CTA
+  const next = COURSE.find(m=>!state.progress[m.id].completed);
+  const ctaLabel = done===0 ? "Begin Module 1" : (next ? "Continue \u2014 " + next.title : "Review the course");
+  const ctaTarget = next ? next.id : COURSE[0].id;
+
+  // storage status \u2014 reflects the active persistence tier
+  let storageNote;
+  if(Persist.mode === "local-storage")
+    storageNote = "Your progress, quiz answers, ratings, and notes save automatically to this browser \u2014 they'll be here when you reopen the file. (Saved per browser; using a different browser or a private window starts fresh.)";
+  else if(Persist.mode === "window-storage")
+    storageNote = "Your progress, quiz answers, ratings, and notes save automatically and will be here when you return.";
+  else
+    storageNote = "Note: this browser is blocking local storage (often a private/incognito window), so progress will reset on reload. Everything still works for this session \u2014 open the file in a normal window to save progress.";
+
+  return `
+    <div class="ov-kicker">A Self-Paced Executive Course</div>
+    <h1 class="ov-title">Artificial Intelligence,<br>for the leader who has to <em>actually deliver it.</em></h1>
+    <p class="ov-lede">Ten modules that turn an AI curriculum into working judgment \u2014 built for a transformation-team leader running partnerships and BPO, and standing up an innovation function in a life &amp; annuity company.</p>
+    <p class="ov-lede small">Each module pairs plain-language teaching with a knowledge check and a reflection tied to your real work. The through-line: the tools will keep changing, so the durable asset is the discipline. ${Persist.persistent?"":"<br>"}<span style="font-size:13px;color:var(--ink-faint)">${storageNote}</span></p>
+
+    <div class="ov-cta">
+      <button class="btn btn-primary wide" data-goto="${ctaTarget}">
+        ${esc(ctaLabel)}
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8h9M8 3l5 5-5 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <button class="btn btn-ghost" data-goto="glossary">Browse the glossary</button>
+    </div>
+
+    <div class="ov-rule"></div>
+    <div class="ov-h">The Ten Modules &middot; ${done} of 10 complete</div>
+    <div class="ov-grid">${cards}</div>
+
+    <div class="ov-rule"></div>
+    <div class="ov-h">The Operator Track &middot; turn learning into career capital</div>
+    <p class="sec" style="font-size:15px;color:var(--ink-2);margin-bottom:18px">The modules build judgment. This parallel track builds <strong>visible capability</strong> \u2014 the goal isn't to \u201clearn AI\u201d but to become an <em>AI-enabled transformation operator</em>: someone who can understand the business problem, prototype the solution, explain the architecture, manage the risks, and turn it into an operating improvement. Three connected workspaces:</p>
+    <div class="ov-grid">
+      <button class="ov-card" data-goto="op-gapmap">
+        <span class="ov-num">&#9650;</span>
+        <span class="ov-cbody">
+          <span class="ov-cname">Target &amp; Knowledge Gap Map</span>
+          <span class="ov-cdesc">Define the target capability, then rate yourself across the eight capabilities an operator needs \u2014 a live, honest map of where the effort should go.</span>
+        </span>
+        <span class="ov-cmeta"><span class="ov-pill ${gapRatedCount()===8?"done":"todo"}">${gapRatedCount()}/8 rated</span></span>
+      </button>
+      <button class="ov-card" data-goto="op-sprint">
+        <span class="ov-num">&#9650;</span>
+        <span class="ov-cbody">
+          <span class="ov-cname">The 30-Day Knowledge Sprint</span>
+          <span class="ov-cdesc">Four weeks: vocabulary, build something small, enterprise translation, and a career-capital artifact. Checkable tasks, week by week.</span>
+        </span>
+        <span class="ov-cmeta"><span class="ov-pill ${sprintDoneCount()===sprintTotal()?"done":"todo"}">${sprintDoneCount()}/${sprintTotal()} tasks</span></span>
+      </button>
+      <button class="ov-card" data-goto="op-quiz">
+        <span class="ov-num">&#9650;</span>
+        <span class="ov-cbody">
+          <span class="ov-cname">Weekly Quiz &amp; Career Artifact</span>
+          <span class="ov-cdesc">Six practical questions to run each sprint week, plus the structure for your gap-map artifact and the seven-part executive case study.</span>
+        </span>
+        <span class="ov-cmeta"><span class="ov-pill todo">Workspace</span></span>
+      </button>
+    </div>
+
+    <div class="ov-rule"></div>
+    <div class="ov-h">How to use this</div>
+    <p class="sec" style="font-size:15px;color:var(--ink-2)">Work through the modules in order \u2014 they build. Read each module, study its infographic, take the knowledge check (you'll see why each answer is right or wrong), and use the reflection box to apply it to a real situation on your desk. Run the <strong>Operator Track</strong> alongside the modules: it's the practical, capability-building companion to the conceptual learning. When all ten modules are done, the <strong>Capstone Worksheet</strong> unlocks \u2014 a six-step exercise that assembles everything into the intake-to-scale flow for your innovation function. Everything you type, rate, and check ${Persist.persistent?"saves automatically.":"works for this session."}</p>
+  `;
+}
+
+/* ============================================================
+   RENDER: MODULE
+   ============================================================ */
+function moduleHTML(id){
+  const m = COURSE[moduleIndex(id)];
+  const idx = moduleIndex(id);
+  const p = state.progress[id];
+
+  let sections = "";
+  m.sections.forEach(s=>{
+    let paras = s.b.map(x=>`<p>${x}</p>`).join("");
+    sections += `<div class="sec"><h3><span class="sec-tick"></span>${esc(s.h)}</h3>${paras}</div>`;
+  });
+
+  let concepts = m.concepts.map(c=>`
+    <div class="concept">
+      <div class="cterm">${esc(c.t)}</div>
+      <div class="cdef">${esc(c.d)}</div>
+    </div>`).join("");
+
+  let applyParas = m.apply.p.map(x=>`<p>${x}</p>`).join("");
+
+  // quiz
+  const answered = Object.keys(p.quizAnswers).length;
+  const correct = m.quiz.filter((q,qi)=>p.quizAnswers[qi]===q.a).length;
+  const scoreClass = (answered===m.quiz.length && correct===m.quiz.length) ? "good" : "";
+  let quizQs = "";
+  m.quiz.forEach((q,qi)=>{
+    const picked = p.quizAnswers[qi];
+    const hasPicked = picked !== undefined;
+    let opts = "";
+    q.o.forEach((o,oi)=>{
+      let cls = "opt";
+      if(hasPicked){
+        cls += " disabled";
+        if(oi===q.a) cls += " correct";
+        else if(oi===picked) cls += " wrong";
+        else cls += " muted";
+      }
+      const key = String.fromCharCode(65+oi);
+      opts += `<button class="${cls}" data-q="${qi}" data-o="${oi}" ${hasPicked?"disabled":""}>
+        <span class="opt-key">${key}</span><span>${esc(o)}</span>
+      </button>`;
+    });
+    const isRight = picked===q.a;
+    const explainCls = hasPicked ? (isRight?"explain right show":"explain miss show") : "explain";
+    const explainTxt = hasPicked ? `<strong>${isRight?"Correct.":"Not quite."}</strong> ${esc(q.e)}` : "";
+    quizQs += `<div class="q" data-qi="${qi}">
+      <div class="q-text"><span class="q-n">Q${qi+1}.</span>${esc(q.q)}</div>
+      ${opts}
+      <div class="${explainCls}">${explainTxt}</div>
+    </div>`;
+  });
+
+  // footer nav
+  const prev = idx>0 ? COURSE[idx-1] : null;
+  const nextM = idx<COURSE.length-1 ? COURSE[idx+1] : null;
+  const completeBtn = p.completed
+    ? `<button class="btn btn-ghost" id="markBtn" data-state="done">
+         <svg width="15" height="15" viewBox="0 0 16 16" fill="none"><path d="M3 8.5l3.5 3.5L13 4.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+         Module complete</button>`
+    : `<button class="btn btn-primary" id="markBtn" data-state="todo">Mark module complete
+         <svg width="15" height="15" viewBox="0 0 16 16" fill="none"><path d="M3 8.5l3.5 3.5L13 4.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+       </button>`;
+
+  return `
+    <div class="m-top">
+      <span class="m-num">Module ${idx+1}</span>
+      <span class="m-track">&middot;&nbsp;&nbsp;${esc(m.track)} track</span>
+    </div>
+    <h1 class="m-title">${esc(m.title)}</h1>
+    <p class="m-sub">${esc(m.sub)}</p>
+
+    <div class="callout">
+      <div class="cl-label">Why this matters to you</div>
+      <p>${m.why}</p>
+    </div>
+
+    <div class="figure">
+      <div class="figure-head">
+        <span class="figure-kicker">Infographic</span>
+        <span class="figure-name">${esc(m.fig.name)}</span>
+      </div>
+      <div class="figure-body">${m.fig.svg}</div>
+      <div class="figure-cap">${m.fig.cap}</div>
+    </div>
+
+    ${sections}
+
+    <div class="sec"><h3><span class="sec-tick"></span>Key concepts</h3></div>
+    <div class="concepts">${concepts}</div>
+
+    <div class="apply">
+      <div class="ap-label">&#9670;&nbsp; Apply it</div>
+      <h4>${esc(m.apply.h)}</h4>
+      ${applyParas}
+    </div>
+
+    <div class="quiz">
+      <div class="quiz-head">
+        <div class="quiz-title">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="8" stroke="var(--rust)" stroke-width="1.6"/><path d="M7.5 7.8c0-1.4 1.1-2.3 2.5-2.3s2.4.9 2.4 2.2c0 1-.6 1.6-1.5 2.1-.7.4-1 .8-1 1.6" stroke="var(--rust)" stroke-width="1.6" stroke-linecap="round"/><circle cx="10" cy="14.6" r=".9" fill="var(--rust)"/></svg>
+          Knowledge Check
+        </div>
+        <div class="quiz-score ${scoreClass}">${answered}/${m.quiz.length} answered${answered>0?" \u00b7 "+correct+" correct":""}</div>
+      </div>
+      <p class="quiz-intro">Pick an answer to see whether it's right and why. There's no penalty for a wrong pick \u2014 the explanation is the point.</p>
+      ${quizQs}
+    </div>
+
+    <div class="reflect">
+      <div class="reflect-label">Reflection</div>
+      <p class="reflect-hint">${m.reflect}</p>
+      <textarea id="reflectBox" placeholder="Think it through here \u2014 this saves automatically\u2026">${esc(p.notes)}</textarea>
+      <div class="saved-tag" id="savedTag">
+        <svg width="12" height="12" viewBox="0 0 14 14" fill="none"><path d="M2.5 7.5l3 3 6-7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Saved
+      </div>
+    </div>
+
+    <div class="m-footer">
+      ${prev ? `<button class="fnav" data-goto="${prev.id}">
+        <svg width="15" height="15" viewBox="0 0 16 16" fill="none"><path d="M13 8H4M8 3L3 8l5 5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        ${esc(prev.title)}</button>` : `<span class="fnav disabled">Start of course</span>`}
+      ${completeBtn}
+      ${nextM ? `<button class="fnav" data-goto="${nextM.id}">${esc(nextM.title)}
+        <svg width="15" height="15" viewBox="0 0 16 16" fill="none"><path d="M3 8h9M8 3l5 5-5 5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></button>`
+        : `<button class="fnav" data-goto="capstone">To the Capstone
+        <svg width="15" height="15" viewBox="0 0 16 16" fill="none"><path d="M3 8h9M8 3l5 5-5 5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></button>`}
+    </div>
+  `;
+}
+
+/* ============================================================
+   RENDER: GLOSSARY
+   ============================================================ */
+function glossaryHTML(){
+  let items = GLOSSARY.map(g=>`
+    <div class="gl-item" data-term="${esc(g.t.toLowerCase())}" data-def="${esc(g.d.toLowerCase())}">
+      <div class="gl-term">${esc(g.t)}<span>${esc(g.m)}</span></div>
+      <div class="gl-def">${esc(g.d)}</div>
+    </div>`).join("");
+  return `
+    <div class="m-top"><span class="m-num">Reference</span></div>
+    <h1 class="m-title">Glossary</h1>
+    <p class="m-sub">Every key term from the course in one place \u2014 each tagged with the module it comes from. Use it as a quick-reference when an idea or a vendor pitch needs decoding.</p>
+    <input class="gl-search" id="glSearch" type="text" placeholder="Search terms and definitions\u2026" autocomplete="off">
+    <div id="glList">${items}</div>
+  `;
+}
+
+/* ============================================================
+   RENDER: CAPSTONE
+   ============================================================ */
+function capstoneHTML(){
+  if(!allDone()){
+    const left = COURSE.length - completedCount();
+    return `
+      <div class="m-top"><span class="m-num">Capstone</span></div>
+      <h1 class="m-title">Capstone Worksheet</h1>
+      <p class="m-sub">A six-step exercise that assembles the whole course into the intake-to-scale flow for your innovation function.</p>
+      <div class="cap-locked">
+        <div class="cl-ico">&#128274;</div>
+        <h4>Finish the modules to unlock</h4>
+        <p>The capstone pulls every framework together \u2014 it's most useful once all ten modules are complete. You have <strong>${left}</strong> ${left===1?"module":"modules"} to go.</p>
+      </div>
+    `;
+  }
+
+  let steps = "";
+  CAPSTONE_STEPS.forEach((s,i)=>{
+    steps += `<div class="cap-step">
+      <div class="cap-n">${i+1}</div>
+      <div class="cap-b">
+        <h4>${esc(s.h)}</h4>
+        <p>${esc(s.p)}</p>
+        <textarea class="cap-ta" data-step="${i}" placeholder="${esc(s.ph)}">${esc(state.capstone[i]||"")}</textarea>
+      </div>
+    </div>`;
+  });
+
+  return `
+    <div class="complete-banner">
+      <div class="cb-k">&#9733;&nbsp; All ten modules complete</div>
+      <h3>You've built the kit. Now assemble it.</h3>
+      <p>This worksheet walks one real opportunity from your desk through the full discipline \u2014 the same flow your innovation function should run every idea through.</p>
+    </div>
+    <h1 class="m-title">Capstone Worksheet</h1>
+    <p class="m-sub">Pick one genuine opportunity from your partnerships, BPO, or innovation remit and work it through all six steps. Your answers save automatically \u2014 come back and refine them as the work develops.</p>
+    ${steps}
+    <div class="m-footer">
+      <button class="fnav" data-goto="m10">
+        <svg width="15" height="15" viewBox="0 0 16 16" fill="none"><path d="M13 8H4M8 3L3 8l5 5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Module 10</button>
+      <button class="btn btn-ghost" data-goto="overview">Back to overview</button>
+      <span class="fnav disabled">End of course</span>
+    </div>
+  `;
+}
+
+/* ============================================================
+   RENDER: OPERATOR TRACK
+   ============================================================ */
+const OP_LEVEL_COLORS = ["#D6CBB1","#9a8a4e","#BE912E","#5a6b3f","#2E4639"];
+let opQuizWeek = 1;
+
+function opGapBarsSVG(){
+  const x0=176, barW=508, rowH=30, top=14;
+  let rows = OP_GAP_MAP.map((g,i)=>{
+    const y = top + i*rowH;
+    const lvl = state.operator.gap[g.id].level;
+    const w = lvl>0 ? (lvl/4*barW) : 0;
+    const col = OP_LEVEL_COLORS[lvl];
+    const label = lvl>0 ? OP_LEVELS[lvl-1] : "Not yet rated";
+    const shortName = g.name;
+    return `<text x='168' y='${y+15}' text-anchor='end' fill='var(--ink-2)' font-size='10.5' font-weight='600' class='fg-t'>${esc(shortName)}</text>
+      <rect x='${x0}' y='${y+5}' width='${barW}' height='14' rx='7' fill='var(--paper-2)' stroke='var(--line-soft)'/>
+      <rect id='bar-${g.id}' x='${x0}' y='${y+5}' width='${w}' height='14' rx='7' fill='${col}'/>
+      <text id='barlbl-${g.id}' x='${x0+barW+8}' y='${y+15}' fill='${lvl>0?col:"var(--ink-faint)"}' font-size='9' font-weight='${lvl>0?700:400}' font-style='${lvl>0?"normal":"italic"}' class='fg-t'>${label}</text>`;
+  }).join("");
+  const h = top + OP_GAP_MAP.length*rowH + 6;
+  return `<svg viewBox='0 0 720 ${h}' xmlns='http://www.w3.org/2000/svg'>${rows}</svg>`;
+}
+
+function opGapMapHTML(){
+  const target = state.operator.target;
+  let rows = OP_GAP_MAP.map((g,i)=>{
+    const gs = state.operator.gap[g.id];
+    let pills = OP_LEVELS.map((lbl,li)=>{
+      const lvl = li+1;
+      return `<button class="gap-lvl ${gs.level===lvl?"on":""}" data-gap="${g.id}" data-lvl="${lvl}">${esc(lbl)}</button>`;
+    }).join("");
+    return `<div class="gap-row">
+      <div class="gap-top">
+        <span class="gap-name">${i+1}. ${esc(g.name)}</span>
+        <span class="gap-why">${esc("\u2192 "+g.why)}</span>
+      </div>
+      <div class="gap-learn"><b>Learn:</b> ${esc(g.learn)}</div>
+      <div class="gap-proof"><b>Proof point:</b> ${esc(g.proof)}</div>
+      <div class="gap-rate" role="group" aria-label="Your current level">${pills}</div>
+      <textarea class="gap-note" data-gap="${g.id}" placeholder="Proof-point progress \u2014 what have you done, what's next?">${esc(gs.note)}</textarea>
+    </div>`;
+  }).join("");
+
+  return `
+    <div class="m-top">
+      <span class="m-num">The Operator Track</span>
+      <span class="m-track">&middot;&nbsp;&nbsp;Part 1 of 3</span>
+    </div>
+    <h1 class="m-title">Target &amp; Knowledge Gap Map</h1>
+    <p class="m-sub">The ten modules build the judgment. This track builds the <em>career capital</em> \u2014 turning understanding into a visible, executive-ready capability. It starts with an honest map of where you are.</p>
+
+    <div class="op-northstar">
+      <div class="op-ns-label">&#9650;&nbsp; Define the target capability</div>
+      <div class="op-ns-quote">\u201cLearn AI\u201d is too vague to act on. The target is to become an <strong style="color:var(--gold);font-weight:600">AI-enabled transformation operator</strong> \u2014 someone who can understand the business problem, prototype the solution, explain the architecture, manage the risks, and turn it into an operating improvement.</div>
+      <textarea id="opTarget" placeholder="${esc(OP_TARGET_DEFAULT)}">${esc(target)}</textarea>
+      <div class="op-ns-hint">Make this yours \u2014 edit the north-star statement above. A sharp target produces a sharper gap map. Saves automatically.</div>
+    </div>
+
+    <div class="sec"><h3><span class="sec-tick"></span>Your gap map, at a glance</h3>
+      <p>Rate each of the eight capabilities below and this picture fills in. It's not a scorecard for anyone else \u2014 it's a planning instrument. The honest low bars are where the next month of effort should go.</p>
+    </div>
+    <div class="figure">
+      <div class="figure-head">
+        <span class="figure-kicker">Infographic</span>
+        <span class="figure-name">The Eight Capabilities \u2014 Current Self-Assessment</span>
+      </div>
+      <div class="figure-body" id="opGapFig">${opGapBarsSVG()}</div>
+      <div class="figure-cap"><strong>Aware</strong> \u2192 <strong>Learning</strong> \u2192 <strong>Capable</strong> \u2192 <strong>Fluent.</strong> Rate honestly. The gap between where the bars are and where they need to be is your real curriculum.</div>
+    </div>
+
+    <div class="sec"><h3><span class="sec-tick"></span>The eight capabilities</h3>
+      <p>Each capability pairs <em>what to learn</em> with <em>why it matters</em> and a concrete <em>proof point</em> \u2014 the artifact that demonstrates you actually have it. Rate your current level and use the notes to track proof-point progress.</p>
+    </div>
+    ${rows}
+
+    <div class="apply">
+      <div class="ap-label">&#9670;&nbsp; The discipline this enforces</div>
+      <h4>From collecting concepts to building capability</h4>
+      <p>Without a gap map, AI learning drifts into \u201cinteresting concepts collected.\u201d With one, it becomes \u201cvisible, executive-ready transformation capability built.\u201d Every capability here has a proof point for exactly that reason \u2014 a thing you can point to, not just a thing you know.</p>
+    </div>
+
+    <div class="m-footer">
+      <span class="fnav disabled">Start of the Operator Track</span>
+      <button class="btn btn-primary" data-goto="op-sprint">Next: the 30-Day Sprint
+        <svg width="15" height="15" viewBox="0 0 16 16" fill="none"><path d="M3 8h9M8 3l5 5-5 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <button class="fnav" data-goto="op-quiz">Quiz &amp; Artifact
+        <svg width="15" height="15" viewBox="0 0 16 16" fill="none"><path d="M3 8h9M8 3l5 5-5 5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+    </div>
+  `;
+}
+
+function opSprintHTML(){
+  const done = sprintDoneCount(), total = sprintTotal();
+  let weeks = OP_SPRINT.map(w=>{
+    let tDone = 0;
+    let tasks = w.tasks.map((t,i)=>{
+      const key = "w"+w.wk+"t"+i;
+      const on = !!state.operator.sprint[key];
+      if(on) tDone++;
+      return `<div class="task">
+        <button class="task-box ${on?"checked":""}" data-sprint="${key}" aria-label="Toggle task">
+          <svg width="13" height="13" viewBox="0 0 14 14" fill="none"><path d="M2.5 7.5l3 3 6-7" stroke="#F9F5EB" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+        <span class="task-text ${on?"struck":""}">${esc(t)}</span>
+      </div>`;
+    }).join("");
+    const noteKey = "w"+w.wk+"note";
+    const cntDone = tDone===w.tasks.length;
+    return `<div class="wk">
+      <div class="wk-head">
+        <div class="wk-badge"><b>${w.wk}</b><span>Week</span></div>
+        <div class="wk-htext">
+          <h4>${esc(w.title)}</h4>
+          <p>${esc(w.focus)}</p>
+        </div>
+        <div class="wk-count ${cntDone?"done":""}" id="wkcount-${w.wk}">${tDone}/${w.tasks.length}</div>
+      </div>
+      <div class="wk-body">
+        ${tasks}
+        <div class="wk-note-label">Week note</div>
+        <textarea class="wk-note" data-sprint-note="${noteKey}" placeholder="${esc(w.note)}">${esc(state.operator.sprint[noteKey]||"")}</textarea>
+      </div>
+    </div>`;
+  }).join("");
+
+  return `
+    <div class="m-top">
+      <span class="m-num">The Operator Track</span>
+      <span class="m-track">&middot;&nbsp;&nbsp;Part 2 of 3</span>
+    </div>
+    <h1 class="m-title">The 30-Day Knowledge Sprint</h1>
+    <p class="m-sub">Four weeks, four moves: get the vocabulary, build something small, translate it to the enterprise, and ship a career-capital artifact. The point isn't elegance \u2014 it's understanding the moving parts well enough to direct them.</p>
+
+    <div class="figure">
+      <div class="figure-head">
+        <span class="figure-kicker">Infographic</span>
+        <span class="figure-name">The Four-Week Arc</span>
+      </div>
+      <div class="figure-body">
+        <svg viewBox='0 0 720 168' xmlns='http://www.w3.org/2000/svg' font-family='Hanken Grotesk,sans-serif'>
+          <defs><marker id='ahsp' viewBox='0 0 10 10' refX='7' refY='5' markerWidth='7' markerHeight='7' orient='auto'><path d='M0 0 L9 5 L0 10 z' fill='var(--ink-faint)'/></marker></defs>
+          ${OP_SPRINT.map((w,i)=>{
+            const x=6+i*178, c=["#8B8270","var(--forest)","var(--gold)","var(--rust)"][i];
+            return `<rect x='${x}' y='20' width='160' height='100' rx='11' fill='var(--paper-2)' stroke='var(--line)'/>
+              <path d='M${x} 30 a10 10 0 0 1 10 -10 h140 a10 10 0 0 1 10 10 v18 H${x} Z' fill='${c}'/>
+              <text x='${x+80}' y='40' text-anchor='middle' fill='var(--paper-3)' font-size='9.5' font-weight='700' letter-spacing='.1em'>WEEK ${w.wk}</text>
+              <text x='${x+80}' y='73' text-anchor='middle' fill='var(--ink)' font-size='13' font-weight='600' font-family='Fraunces,serif'>${["Vocabulary","Build Small","Translate","Artifact"][i]}</text>
+              <text x='${x+80}' y='95' text-anchor='middle' fill='var(--ink-soft)' font-size='9'>${["language down cold","understand the parts","enterprise-ready","make it visible"][i]}</text>
+              ${i<3?`<path d='M${x+160} 70 l12 0' stroke='var(--ink-faint)' stroke-width='2' marker-end='url(#ahsp)'/>`:""}`;
+          }).join("")}
+          <text x='360' y='148' text-anchor='middle' fill='var(--ink-faint)' font-size='10.5' font-style='italic' font-family='Fraunces,serif'>Each week ends with a proof point \u2014 the arc compounds into something you can show.</text>
+        </svg>
+      </div>
+      <div class="figure-cap">Progress so far: <strong>${done} of ${total} tasks</strong> complete. Check tasks as you finish them; your week notes save automatically.</div>
+    </div>
+
+    ${weeks}
+
+    <div class="apply">
+      <div class="ap-label">&#9670;&nbsp; A note on Week 2</div>
+      <h4>\u201cBuild or direct\u201d \u2014 both count</h4>
+      <p>You don't have to write the code yourself. Directing a builder \u2014 or an AI \u2014 through a working prototype builds the same understanding of the moving parts. The goal of Week 2 is that no component of an AI workflow is a black box to you anymore. That's what lets you work credibly with builders and call hype when you see it.</p>
+    </div>
+
+    <div class="m-footer">
+      <button class="fnav" data-goto="op-gapmap">
+        <svg width="15" height="15" viewBox="0 0 16 16" fill="none"><path d="M13 8H4M8 3L3 8l5 5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Target &amp; Gap Map</button>
+      <button class="btn btn-primary" data-goto="op-quiz">Next: Quiz &amp; Artifact
+        <svg width="15" height="15" viewBox="0 0 16 16" fill="none"><path d="M3 8h9M8 3l5 5-5 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <span class="fnav disabled">Part 2 of 3</span>
+    </div>
+  `;
+}
+
+function opQuizHTML(){
+  let tabs = OP_SPRINT.map(w=>
+    `<button class="wk-tab ${opQuizWeek===w.wk?"on":""}" data-wktab="${w.wk}">Week ${w.wk}</button>`
+  ).join("");
+
+  let qs = OP_QUIZ_QS.map((q,i)=>{
+    const key = "w"+opQuizWeek+"q"+i;
+    return `<div class="opq">
+      <div class="opq-q"><span class="opq-n">${i+1}</span><span>${esc(q)}</span></div>
+      <textarea data-opq="${key}" placeholder="Your honest answer for Week ${opQuizWeek}\u2026">${esc(state.operator.quiz[key]||"")}</textarea>
+    </div>`;
+  }).join("");
+
+  let artifacts = OP_ARTIFACT.map(a=>
+    `<div class="artifact-box">
+      <h4>${esc(a.h)}</h4>
+      <p>${esc(a.p)}</p>
+      <textarea data-artifact="${a.id}" placeholder="${esc(a.ph)}">${esc(state.operator.artifact[a.id]||"")}</textarea>
+    </div>`
+  ).join("");
+
+  return `
+    <div class="m-top">
+      <span class="m-num">The Operator Track</span>
+      <span class="m-track">&middot;&nbsp;&nbsp;Part 3 of 3</span>
+    </div>
+    <h1 class="m-title">Weekly Quiz &amp; Career Artifact</h1>
+    <p class="m-sub">A practical weekly check \u2014 not trivia, but six questions that force the learning into proof. And the structure for the artifact that makes your capability visible to executives.</p>
+
+    <div class="callout">
+      <div class="cl-label">Why this matters to you</div>
+      <p>The weekly quiz is what keeps the sprint honest. Each question maps to a different layer of becoming an operator \u2014 what you <em>know</em>, what you can <em>explain</em>, what you can <em>build</em>, and what you've <em>applied</em>. A fuzzy answer is a signal, not a failure.</p>
+    </div>
+
+    <div class="sec"><h3><span class="sec-tick"></span>The weekly operator quiz</h3>
+      <p>Run these six questions at the end of each sprint week. Pick a week below \u2014 each week's answers save separately, so you build a running record of how the capability compounds.</p>
+    </div>
+    <div class="wk-tabs">${tabs}</div>
+    ${qs}
+
+    <div class="sec" style="margin-top:38px"><h3><span class="sec-tick"></span>The career-capital artifact</h3>
+      <p>This is the Week 4 deliverable and the most important thing the Operator Track produces. Your immediate next action: create a file \u2014 <strong>ai-transformation-learning-gap-map.md</strong> \u2014 built on these three sections. A starter version is included with this course; the boxes below are your working space to draft it.</p>
+    </div>
+    ${artifacts}
+
+    <div class="apply">
+      <div class="ap-label">&#9670;&nbsp; The case study that makes you promotable</div>
+      <h4>Seven parts, one page</h4>
+      <p>When the gap map is filled and the sprint is run, fold it into a short case study with seven parts: <strong>Problem</strong> \u00b7 <strong>AI-enabled solution</strong> \u00b7 <strong>Prototype or concept</strong> \u00b7 <strong>Risks</strong> \u00b7 <strong>Operating model</strong> \u00b7 <strong>Value hypothesis</strong> \u00b7 <strong>Next decision needed</strong>.</p>
+      <p>That last part \u2014 the decision you're putting in front of a leader \u2014 is what separates an operator from a commentator. It's also the natural bridge into the Capstone Worksheet, which walks a real opportunity through exactly that discipline.</p>
+    </div>
+
+    <div class="m-footer">
+      <button class="fnav" data-goto="op-sprint">
+        <svg width="15" height="15" viewBox="0 0 16 16" fill="none"><path d="M13 8H4M8 3L3 8l5 5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        The 30-Day Sprint</button>
+      <button class="btn btn-ghost" data-goto="${allDone()?"capstone":"overview"}">${allDone()?"To the Capstone Worksheet":"Back to overview"}</button>
+      <span class="fnav disabled">End of the Operator Track</span>
+    </div>
+  `;
+}
+
+/* ============================================================
+   WIRE: STAGE INTERACTIONS
+   ============================================================ */
+function wireStage(){
+  // any element with data-goto
+  document.querySelectorAll("[data-goto]").forEach(el=>{
+    el.addEventListener("click", ()=> go(el.dataset.goto));
+  });
+
+  // quiz options
+  document.querySelectorAll(".opt:not(.disabled)").forEach(opt=>{
+    opt.addEventListener("click", ()=>{
+      const qi = parseInt(opt.dataset.q,10);
+      const oi = parseInt(opt.dataset.o,10);
+      const p = state.progress[state.view];
+      if(p.quizAnswers[qi] !== undefined) return;
+      p.quizAnswers[qi] = oi;
+      saveState();
+      renderStage(); // re-render to lock + reveal
+    });
+  });
+
+  // mark complete
+  const markBtn = $("#markBtn");
+  if(markBtn){
+    markBtn.addEventListener("click", ()=>{
+      const p = state.progress[state.view];
+      p.completed = !p.completed;
+      saveState();
+      renderSidebar();
+      if(p.completed){
+        // advance to next module or capstone
+        const idx = moduleIndex(state.view);
+        const target = idx<COURSE.length-1 ? COURSE[idx+1].id : "capstone";
+        setTimeout(()=>go(target), 180);
+      }else{
+        renderStage();
+      }
+    });
+  }
+
+  // reflection textarea
+  const rbox = $("#reflectBox");
+  if(rbox){
+    let tag = $("#savedTag");
+    let tagTimer = null;
+    rbox.addEventListener("input", ()=>{
+      state.progress[state.view].notes = rbox.value;
+      saveState();
+      if(tag){
+        tag.classList.add("show");
+        clearTimeout(tagTimer);
+        tagTimer = setTimeout(()=>tag.classList.remove("show"), 1600);
+      }
+    });
+  }
+
+  // capstone textareas
+  document.querySelectorAll(".cap-ta").forEach(ta=>{
+    ta.addEventListener("input", ()=>{
+      state.capstone[ta.dataset.step] = ta.value;
+      saveState();
+    });
+  });
+
+  // glossary search
+  const gs = $("#glSearch");
+  if(gs){
+    gs.addEventListener("input", ()=>{
+      const q = gs.value.trim().toLowerCase();
+      let visible = 0;
+      document.querySelectorAll(".gl-item").forEach(it=>{
+        const match = !q || it.dataset.term.includes(q) || it.dataset.def.includes(q);
+        it.style.display = match ? "" : "none";
+        if(match) visible++;
+      });
+      let empty = $("#glEmpty");
+      if(visible===0){
+        if(!empty){
+          empty = document.createElement("div");
+          empty.id = "glEmpty";
+          empty.className = "gl-empty";
+          empty.textContent = "No terms match that search.";
+          $("#glList").appendChild(empty);
+        }
+      }else if(empty){ empty.remove(); }
+    });
+  }
+
+  /* ---- Operator Track wiring ---- */
+
+  // north-star target
+  const optt = $("#opTarget");
+  if(optt){
+    optt.addEventListener("input", ()=>{
+      state.operator.target = optt.value;
+      saveState();
+    });
+  }
+
+  // gap-map level pills \u2014 targeted update, no full re-render (preserves note focus)
+  document.querySelectorAll(".gap-lvl").forEach(pill=>{
+    pill.addEventListener("click", ()=>{
+      const gid = pill.dataset.gap;
+      const lvl = parseInt(pill.dataset.lvl,10);
+      const cur = state.operator.gap[gid].level;
+      const next = (cur===lvl) ? 0 : lvl;   // click active level again to clear
+      state.operator.gap[gid].level = next;
+      saveState();
+      // update pills in this row
+      document.querySelectorAll(`.gap-lvl[data-gap="${gid}"]`).forEach(p=>{
+        p.classList.toggle("on", parseInt(p.dataset.lvl,10)===next);
+      });
+      // update the live bar in the infographic
+      const bar = $("#bar-"+gid), lbl = $("#barlbl-"+gid);
+      if(bar){
+        const barW=508;
+        bar.setAttribute("width", next>0 ? (next/4*barW) : 0);
+        bar.setAttribute("fill", OP_LEVEL_COLORS[next]);
+      }
+      if(lbl){
+        lbl.textContent = next>0 ? OP_LEVELS[next-1] : "Not yet rated";
+        lbl.setAttribute("fill", next>0 ? OP_LEVEL_COLORS[next] : "var(--ink-faint)");
+        lbl.setAttribute("font-weight", next>0 ? 700 : 400);
+        lbl.setAttribute("font-style", next>0 ? "normal" : "italic");
+      }
+      renderSidebar();
+    });
+  });
+
+  // gap-map proof notes
+  document.querySelectorAll(".gap-note").forEach(ta=>{
+    ta.addEventListener("input", ()=>{
+      state.operator.gap[ta.dataset.gap].note = ta.value;
+      saveState();
+    });
+  });
+
+  // sprint task checkboxes \u2014 targeted update
+  document.querySelectorAll(".task-box").forEach(box=>{
+    box.addEventListener("click", ()=>{
+      const key = box.dataset.sprint;
+      const on = !state.operator.sprint[key];
+      state.operator.sprint[key] = on;
+      saveState();
+      box.classList.toggle("checked", on);
+      const txt = box.parentElement.querySelector(".task-text");
+      if(txt) txt.classList.toggle("struck", on);
+      // update week count
+      const wk = key.match(/^w(\d+)t/)[1];
+      const week = OP_SPRINT.find(w=>String(w.wk)===wk);
+      let tDone = 0;
+      week.tasks.forEach((t,i)=>{ if(state.operator.sprint["w"+wk+"t"+i]) tDone++; });
+      const cnt = $("#wkcount-"+wk);
+      if(cnt){
+        cnt.textContent = tDone+"/"+week.tasks.length;
+        cnt.classList.toggle("done", tDone===week.tasks.length);
+      }
+      renderSidebar();
+    });
+  });
+
+  // sprint week notes
+  document.querySelectorAll(".wk-note").forEach(ta=>{
+    ta.addEventListener("input", ()=>{
+      state.operator.sprint[ta.dataset.sprintNote] = ta.value;
+      saveState();
+    });
+  });
+
+  // operator quiz week tabs
+  document.querySelectorAll(".wk-tab").forEach(tab=>{
+    tab.addEventListener("click", ()=>{
+      opQuizWeek = parseInt(tab.dataset.wktab,10);
+      renderStage();
+    });
+  });
+
+  // operator quiz answers
+  document.querySelectorAll("[data-opq]").forEach(ta=>{
+    ta.addEventListener("input", ()=>{
+      state.operator.quiz[ta.dataset.opq] = ta.value;
+      saveState();
+    });
+  });
+
+  // career artifact textareas
+  document.querySelectorAll("[data-artifact]").forEach(ta=>{
+    ta.addEventListener("input", ()=>{
+      state.operator.artifact[ta.dataset.artifact] = ta.value;
+      saveState();
+    });
+  });
+}
+
+/* ============================================================
+   GLOBAL WIRING
+   ============================================================ */
+$("#menuBtn").addEventListener("click", ()=>{
+  $("#sidebar").classList.toggle("open");
+  $("#scrim").classList.toggle("show");
+});
+$("#scrim").addEventListener("click", closeMobileNav);
+function closeMobileNav(){
+  $("#sidebar").classList.remove("open");
+  $("#scrim").classList.remove("show");
+}
+
+$("#resetBtn").addEventListener("click", async ()=>{
+  if(!confirm("Reset all progress \u2014 quiz answers, reflections, capstone notes, and the Operator Track? This can't be undone.")) return;
+  state.view = "overview";
+  state.capstone = {};
+  COURSE.forEach(m => state.progress[m.id] = {completed:false, quizAnswers:{}, notes:""});
+  state.operator = {target:"", gap:{}, sprint:{}, quiz:{}, artifact:{}};
+  OP_GAP_MAP.forEach(g => state.operator.gap[g.id] = {level:0, note:""});
+  opQuizWeek = 1;
+  await Persist.clear();
+  renderSidebar();
+  renderStage();
+  $("#main").scrollTop = 0;
+});
+
+/* ============================================================
+   INIT
+   ============================================================ */
+(async function init(){
+  await loadState();
+  // if saved view is a locked capstone, fall back
+  if(state.view==="capstone" && !allDone()) state.view = "overview";
+  renderSidebar();
+  renderStage();
+})();
+</script>
