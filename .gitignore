@@ -2,3 +2,7 @@
 node_modules/
 .playwright-cli/
 output/
+
+# 30MB source video — exceeds Cloudflare Pages 25MB file limit.
+# The deployable cut is assets/tanks-ailot-trailer.mp4.
+assets/tanks-ailot-marketing-revamp.mp4

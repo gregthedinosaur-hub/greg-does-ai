@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Contact Greg | Greg Does AI</title>
+    <meta
+      name="description"
+      content="Contact Greg Kitchen about Greg Does AI projects, prototypes, and practical AI work."
+    />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Contact Greg | Greg Does AI" />
+    <meta
+      property="og:description"
+      content="Contact Greg Kitchen about practical AI projects, prototypes, and stubborn problems that might benefit from a sharper system."
+    />
+    <meta property="og:image" content="assets/project-tanks-ailot.png" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="theme-color" content="#070A12" />
+    <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,650;9..40,700&family=JetBrains+Mono:wght@500;600&family=Space+Grotesk:wght@500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css?v=20260612-telemetry" />
+    <script src="contact.js?v=20260612-telemetry" defer></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+
+    <header class="site-header">
+      <a class="wordmark" href="index.html#main" aria-label="Greg Does AI home">
+        <span class="wordmark__mark">GK</span>
+        <span class="wordmark__text">Greg Does AI</span>
+      </a>
+      <nav class="site-nav" aria-label="Primary navigation">
+        <a href="index.html#game">Tanks</a>
+        <a href="index.html#projects">Projects</a>
+        <a href="index.html#log">Build log</a>
+        <a href="index.html#about">About</a>
+        <a class="site-nav__cta" href="contact.html" aria-current="page">Contact</a>
+      </nav>
+    </header>
+
+    <main id="main" class="contact-page">
+      <section class="contact-stage" aria-labelledby="contact-title">
+        <div class="contact-scene">
+          <div class="contact-scene__copy">
+            <h1 id="contact-title">
+              Hello.
+              <span>Let’s compare notes on the next useful build.</span>
+            </h1>
+            <p>
+              Practical AI questions, prototype ideas, and stubborn problems
+              that might benefit from a sharper system.
+            </p>
+          </div>
+
+          <div class="contact-scene__art" aria-hidden="true">
+            <span class="signal-star signal-star--one"></span>
+            <span class="signal-star signal-star--two"></span>
+            <span class="signal-star signal-star--three"></span>
+            <span class="signal-line signal-line--one"></span>
+            <span class="signal-line signal-line--two"></span>
+            <span class="signal-node signal-node--one"></span>
+            <span class="signal-node signal-node--two"></span>
+            <span class="signal-card signal-card--one">
+              <span></span>
+              <strong>Scout</strong>
+            </span>
+            <span class="signal-card signal-card--two">
+              <span></span>
+              <strong>Build</strong>
+            </span>
+          </div>
+        </div>
+
+        <div class="contact-panel">
+          <aside class="contact-card" aria-label="Direct email">
+            <svg
+              class="contact-card__icon"
+              viewBox="0 0 48 48"
+              role="img"
+              aria-label="Envelope"
+            >
+              <rect x="7" y="12" width="34" height="24" rx="3"></rect>
+              <path d="M9 15l15 13L39 15"></path>
+              <path d="M9 34l11-10"></path>
+              <path d="M39 34L28 24"></path>
+            </svg>
+            <h2>For project ideas and practical AI questions, email:</h2>
+            <a class="contact-email" href="mailto:gregthedinosaur@gmail.com">
+              gregthedinosaur@gmail.com
+            </a>
+            <p>
+              Or send a message through the form. Either way, useful context is
+              welcome.
+            </p>
+          </aside>
+
+          <form
+            class="contact-form"
+            action="mailto:gregthedinosaur@gmail.com"
+            method="post"
+            enctype="text/plain"
+            data-contact-form
+          >
+            <div class="contact-form__header">
+              <h2>Contact</h2>
+            </div>
+
+            <div class="field-group">
+              <label for="contact-first-name">First name *</label>
+              <input
+                id="contact-first-name"
+                name="firstName"
+                type="text"
+                autocomplete="given-name"
+                required
+              />
+            </div>
+
+            <div class="field-group">
+              <label for="contact-last-name">Last name</label>
+              <input
+                id="contact-last-name"
+                name="lastName"
+                type="text"
+                autocomplete="family-name"
+              />
+            </div>
+
+            <div class="field-group field-group--full">
+              <label for="contact-email">Email *</label>
+              <input
+                id="contact-email"
+                name="email"
+                type="email"
+                autocomplete="email"
+                required
+              />
+            </div>
+
+            <div class="field-group field-group--full">
+              <label for="contact-topic">Project or question</label>
+              <input
+                id="contact-topic"
+                name="topic"
+                type="text"
+                autocomplete="off"
+              />
+            </div>
+
+            <div class="field-group field-group--full">
+              <label for="contact-message">Write a message *</label>
+              <textarea
+                id="contact-message"
+                name="message"
+                rows="4"
+                required
+              ></textarea>
+            </div>
+
+            <button class="button button--primary" type="submit">Open email draft</button>
+            <p class="form-note" data-contact-status>
+              This opens your email app addressed to Greg.
+            </p>
+          </form>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="site-footer__inner">
+        <p>
+          A living index for AI work in progress. More projects will be added
+          as they become ready to share.
+          <span class="site-footer__copyright">© 2026 Greg Kitchen</span>
+        </p>
+        <nav class="site-footer__nav" aria-label="Footer navigation">
+          <a href="index.html#game">Tanks</a>
+          <a href="index.html#projects">Projects</a>
+          <a href="index.html#log">Build log</a>
+          <a href="index.html#about">About</a>
+          <a href="mailto:gregthedinosaur@gmail.com">gregthedinosaur@gmail.com</a>
+        </nav>
+      </div>
+    </footer>
+  </body>
+</html>

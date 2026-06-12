@@ -1,6 +1,13 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="GK">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Greg Does AI robot icon">
   <rect width="64" height="64" rx="18" fill="#F5F8FF"/>
-  <rect x="8" y="8" width="48" height="48" rx="14" fill="#FFFFFF" stroke="#C7D7F5" stroke-width="2"/>
-  <path d="M20 22.5c0-3.6 2.7-6 6.8-6 2.5 0 4.6.8 6.3 2.3l-2.2 3.1c-1.2-1-2.5-1.5-4-1.5-1.8 0-3.1.9-3.1 2.3v18.8H20v-19Z" fill="#2563EB"/>
-  <path d="M36.4 17h4.2v10.4L50.2 17h4.9L44.7 28.1 56 47h-5l-9.2-15.6-1.2 1.3V47h-4.2V17Z" fill="#1A3FAA"/>
+  <path d="M32 18v-6" stroke="#2563EB" stroke-width="3" stroke-linecap="round"/>
+  <circle cx="32" cy="9" r="4" fill="#60A5FA" stroke="#2563EB" stroke-width="2"/>
+  <rect x="12" y="31" width="7" height="14" rx="4" fill="#C7D7F5"/>
+  <rect x="45" y="31" width="7" height="14" rx="4" fill="#C7D7F5"/>
+  <rect x="15" y="18" width="34" height="35" rx="11" fill="#FFFFFF" stroke="#2563EB" stroke-width="3"/>
+  <path d="M21 25h22" stroke="#C7D7F5" stroke-width="2" stroke-linecap="round"/>
+  <circle cx="25" cy="35" r="5.5" fill="#2563EB"/>
+  <circle cx="39" cy="35" r="5.5" fill="#EF4444"/>
+  <path d="M25 45h14" stroke="#0F1629" stroke-width="3" stroke-linecap="round"/>
+  <path d="M28 53h8v4h-8z" fill="#C7D7F5"/>
 </svg>

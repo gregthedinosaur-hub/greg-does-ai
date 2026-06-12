@@ -14,11 +14,13 @@ Open `http://localhost:4173`.
 ## Content Updates
 
 - Project copy lives in `script.js` in the `projects` array.
-- Project thumbnail images live in `assets/project-*.png`.
+- Project thumbnail images live in `assets/project-*.webp` (PNG sources kept beside them).
 - External project links, such as Tanks AiLOT, are stored with each project in `script.js`.
 - Local project pages, such as the AI Mini-MBA course, live beside `index.html`.
 - The AI Mini-MBA course persists progress in the visitor's browser with `localStorage`.
-- The bio portrait is `assets/greg-kitchen-bio.png`.
+- The bio portrait is `assets/greg-kitchen-bio.webp`.
+- Build log entries live in `script.js` in the `buildLog` array.
+- The Tanks trailer is `assets/tanks-ailot-trailer.mp4`; the 30MB source video is gitignored (Cloudflare Pages 25MB file limit).
 - Brand tokens are centralized in `styles.css`.
 
 ## GitHub And Cloudflare Pages
