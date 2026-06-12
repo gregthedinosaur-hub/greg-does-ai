@@ -29,8 +29,8 @@ test("site includes a contact page that emails Greg", async () => {
 
   assert.match(html, /href="contact\.html">Contact/);
   assert.match(contact, /<title>Contact Greg \| Greg Does AI<\/title>/);
-  assert.match(html, /href="#game">Tanks/);
-  assert.match(contact, /href="index\.html#game">Tanks/);
+  assert.match(html, /href="tanks-ailot\/">Tanks/);
+  assert.match(contact, /href="tanks-ailot\/">Tanks/);
   assert.match(contact, /action="mailto:gregthedinosaur@gmail\.com"/);
   assert.match(contact, /data-contact-form/);
   assert.match(contact, /class="contact-stage"/);
@@ -101,23 +101,44 @@ test("homepage features the updated Tanks AiLOT game with trailer and playable e
   );
 
   assert.match(html, /id="game"/);
-  assert.match(html, /href="#game">Play Tanks AiLOT/);
+  assert.match(html, /href="tanks-ailot\/">Play Tanks AiLOT/);
   assert.match(html, /Tanks AiLOT marketing video/);
   assert.match(html, /assets\/tanks-ailot-trailer\.mp4/);
   assert.match(html, /poster="assets\/project-tanks-ailot\.webp"/);
-  assert.match(html, /data-game-src="https:\/\/tanks-ailot\.gregthedinosaur\.workers\.dev"/);
+  assert.match(html, /data-game-src="https:\/\/tanks-ailot\.pages\.dev"/);
   assert.match(html, /data-game-mode="trailer"/);
   assert.match(html, /data-game-mode="play"/);
   assert.match(html, /aria-pressed/);
   assert.match(html, /id="game-loading"/);
   assert.match(html, /id="game-fallback"/);
-  assert.match(html, /Open full screen/);
+  assert.match(html, /Open dedicated page/);
   assert.match(script, /bindGameStage/);
   assert.match(script, /document\.createElement\("iframe"\)/);
   assert.match(script, /frame\.src = media\.dataset\.gameSrc/);
   assert.ok(trailer.size > 0);
   // Cloudflare Pages rejects files over 25MB; the trailer should stay light.
   assert.ok(trailer.size < 10 * 1024 * 1024, "trailer should be under 10MB");
+});
+
+test("Tanks AiLOT is hosted as a dedicated Greg Does AI page", async () => {
+  const html = await read("index.html");
+  const script = await read("script.js");
+  const contact = await read("contact.html");
+  const tanks = await read("tanks-ailot/index.html");
+
+  assert.match(html, /href="tanks-ailot\/">Play Tanks AiLOT/);
+  assert.match(html, /href="tanks-ailot\/">Tanks/);
+  assert.match(contact, /href="tanks-ailot\/">Tanks/);
+  assert.match(script, /url: "tanks-ailot\/"/);
+  assert.match(script, /data-no-new-tab/);
+  assert.match(html, /https:\/\/tanks-ailot\.pages\.dev/);
+
+  assert.match(tanks, /<title>Tanks AiLOT \| Greg Does AI<\/title>/);
+  assert.match(tanks, /href="\/"/);
+  assert.match(tanks, /src="https:\/\/tanks-ailot\.pages\.dev"/);
+  assert.match(tanks, /title="Tanks AiLOT playable game"/);
+  assert.match(tanks, /Open full screen/);
+  assert.match(tanks, /class="tanks-page"/);
 });
 
 test("homepage has a build log with dated entries", async () => {
@@ -229,8 +250,8 @@ test("projects are ordered with optimized local images and Tanks AiLOT link", as
   assert.match(script, /width="1672"/);
   assert.match(script, /height="941"/);
   assert.match(script, /ai-mini-mba-interactive-course\.html/);
-  assert.match(script, /https:\/\/tanks-ailot\.gregthedinosaur\.workers\.dev/);
-  assert.match(script, /target="_blank"/);
+  assert.match(script, /url: "tanks-ailot\/"/);
+  assert.match(script, /data-no-new-tab/);
 });
 
 test("optimized webp assets exist and are small", async () => {

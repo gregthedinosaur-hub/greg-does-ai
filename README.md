@@ -17,6 +17,7 @@ Open `http://localhost:4173`.
 - Project thumbnail images live in `assets/project-*.webp` (PNG sources kept beside them).
 - External project links, such as Tanks AiLOT, are stored with each project in `script.js`.
 - Local project pages, such as the AI Mini-MBA course, live beside `index.html`.
+- The dedicated Tanks AiLOT page lives at `tanks-ailot/index.html` and embeds the current build from `https://tanks-ailot.pages.dev`.
 - The AI Mini-MBA course persists progress in the visitor's browser with `localStorage`.
 - The bio portrait is `assets/greg-kitchen-bio.webp`.
 - Build log entries live in `script.js` in the `buildLog` array.

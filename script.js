@@ -23,8 +23,9 @@ const projects = [
       "Minimal cobalt tactical simulation board with small tanks and path lines",
     video: "assets/tanks-ailot-trailer.mp4",
     videoLabel: "Tanks AiLOT marketing video",
-    url: "https://tanks-ailot.gregthedinosaur.workers.dev",
+    url: "tanks-ailot/",
     ctaLabel: "Open Tanks AiLOT",
+    noNewTab: true,
     summary:
       "A browser simulation for stress-testing AI behavior in a small tactical world with clear rules.",
     description:
@@ -112,8 +113,7 @@ function renderProjects() {
           <a
             class="button button--project"
             href="${project.url}"
-            target="_blank"
-            rel="noopener noreferrer"
+            ${project.noNewTab ? "data-no-new-tab" : 'target="_blank" rel="noopener noreferrer"'}
           >
             ${project.ctaLabel}
           </a>
