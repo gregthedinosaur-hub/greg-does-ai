@@ -13,16 +13,15 @@ Open `http://localhost:4173`.
 
 ## Content Updates
 
-- Project copy lives in `script.js` in the `projects` array.
-- Project thumbnail images live in `assets/project-*.webp` (PNG sources kept beside them).
-- External project links, such as Tanks AiLOT, are stored with each project in `script.js`.
-- Local project pages, such as the AI Mini-MBA course, live beside `index.html`.
+The home page is a lab notebook: hero with the playable Tanks stage, then the build log, then a project list, then a short bio.
+
+- **Build log** entries live in `script.js` in the `buildLog` array, newest first. Each has `date`, `title`, `tried`, `broke`, `stuck`. The newest entry also fills the "Now" line in the hero. Entries get `#log-<date>` permalinks.
+- **Projects** live in `script.js` in the `projects` array. A project with a `url` is "shipped" and gets a thumbnail (`assets/project-*.webp`, PNG source kept beside it); one without a `url` is listed under "Not public yet".
+- Local project pages, such as the AI Mini-MBA course, live beside `index.html`. The course persists progress in the visitor's browser with `localStorage`.
 - The dedicated Tanks AiLOT page lives at `tanks-ailot/index.html` and embeds the current build from `https://tanks-ailot.pages.dev`.
-- The AI Mini-MBA course persists progress in the visitor's browser with `localStorage`.
 - The bio portrait is `assets/greg-kitchen-bio.webp`.
-- Build log entries live in `script.js` in the `buildLog` array.
 - The Tanks trailer is `assets/tanks-ailot-trailer.mp4`; the 30MB source video is gitignored (Cloudflare Pages 25MB file limit).
-- Brand tokens are centralized in `styles.css`.
+- Brand tokens (colors, two web fonts, page width) are centralized at the top of `styles.css`.
 
 ## GitHub And Cloudflare Pages
 

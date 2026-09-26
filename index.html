@@ -6,32 +6,31 @@
     <title>Greg Does AI | Figuring It Out in Public</title>
     <meta
       name="description"
-      content="Greg Does AI: a minimalist index of Greg Kitchen's practical AI experiments, built while figuring out code, AI, and what useful systems can become."
+      content="Greg Does AI: Greg Kitchen's public lab notebook. A playable AI-agent game, a self-paced AI course, and a dated log of what was tried, what broke, and what stuck."
     />
     <meta property="og:type" content="website" />
     <meta property="og:title" content="Greg Does AI | Figuring It Out in Public" />
     <meta
       property="og:description"
-      content="Practical AI experiments for sensing signals, testing simulations, and making ambiguity easier to use. Watch AI agents play Tanks AiLOT live."
+      content="A public lab notebook for practical AI experiments. Play Tanks AiLOT, read the build log, see what broke."
     />
     <meta property="og:image" content="assets/project-tanks-ailot.png" />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="Greg Does AI | Figuring It Out in Public" />
     <meta
       name="twitter:description"
-      content="Practical AI experiments for sensing signals, testing simulations, and making ambiguity easier to use."
+      content="A public lab notebook for practical AI experiments. Play Tanks AiLOT, read the build log, see what broke."
     />
-    <meta name="twitter:image" content="assets/project-tanks-ailot.png" />
-    <meta name="theme-color" content="#070A12" />
+    <meta name="theme-color" content="#0F1114" />
     <link rel="icon" href="favicon.svg" type="image/svg+xml" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,650;9..40,700&family=JetBrains+Mono:wght@500;600&family=Space+Grotesk:wght@500;600;700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;600&family=Space+Grotesk:wght@500;600;700&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="styles.css?v=20260612-telemetry" />
-    <script src="script.js?v=20260612-telemetry" defer></script>
+    <link rel="stylesheet" href="styles.css?v=20260925-notebook" />
+    <script src="script.js?v=20260925-notebook" defer></script>
   </head>
   <body>
     <a class="skip-link" href="#main">Skip to content</a>
@@ -42,9 +41,9 @@
         <span class="wordmark__text">Greg Does AI</span>
       </a>
       <nav class="site-nav" aria-label="Primary navigation">
-        <a href="tanks-ailot/">Tanks</a>
+        <a href="tanks-ailot/">Play</a>
+        <a href="#log">Log</a>
         <a href="#projects">Projects</a>
-        <a href="#log">Build log</a>
         <a href="#about">About</a>
         <a class="site-nav__cta" href="contact.html">Contact</a>
       </nav>
@@ -52,66 +51,24 @@
 
     <main id="main">
       <section class="hero" aria-labelledby="hero-title">
-        <canvas class="hero-sim" id="hero-sim" aria-hidden="true"></canvas>
         <div class="hero__copy">
-          <p class="hero__eyebrow">Practical AI, built in public</p>
-          <h1 id="hero-title" class="hero-title">
-            Greg <span class="hero-title__accent">Does AI</span>
-          </h1>
+          <h1 id="hero-title" class="hero-title">Greg Does AI</h1>
           <p class="hero__lede">
             Learning the machinery while everyone else is still reading the
             memo.
           </p>
           <p class="hero__body">
-            Practical AI experiments for sensing signals, testing simulations,
-            and making ambiguity easier to use. The agents in the background
-            are playing right now.
+            Small AI systems, built to find out how they actually behave: a
+            tactical game where the agents make the calls, a self-paced course,
+            and a dated log of what broke along the way. The tanks are the
+            current build. Press play.
           </p>
-          <div class="hero__actions" aria-label="Page shortcuts">
-            <a class="button button--primary" href="tanks-ailot/">Play Tanks AiLOT</a>
-            <a class="button button--secondary" href="#projects">View projects</a>
-          </div>
-          <dl class="hero-stats" aria-label="Portfolio stats">
-            <div>
-              <dd>4</dd>
-              <dt>Projects</dt>
-            </div>
-            <div>
-              <dd>2</dd>
-              <dt>Live builds</dt>
-            </div>
-            <div>
-              <dd data-sim-decisions>0</dd>
-              <dt>Agent decisions</dt>
-            </div>
-          </dl>
-          <div class="hero-log" id="hero-log" aria-hidden="true"></div>
-        </div>
-
-        <figure class="hero-portrait">
-          <img
-            src="assets/greg-kitchen-bio.webp"
-            alt="Portrait of Greg Kitchen"
-            width="242"
-            height="358"
-          />
-        </figure>
-      </section>
-
-      <section class="game-feature section" id="game" aria-labelledby="game-title">
-        <div class="game-feature__intro">
-          <p class="section-kicker">01 · Featured · Updated build</p>
-          <h2 id="game-title">Tanks AiLOT</h2>
-          <p class="game-feature__lede">
-            A browser simulation for watching AI agents make tactical decisions
-            in a constrained world. The useful part is not the tanks — it is
-            seeing reasoning turn into movement, outcomes, and repeatable
-            experiments. Watch the trailer, or play the latest build right
-            here.
+          <p class="hero__now" data-now>
+            <strong>Now</strong>
           </p>
         </div>
 
-        <div class="game-stage">
+        <div class="game-stage" id="play">
           <div class="game-stage__bar">
             <div class="media-toggle" aria-label="Tanks AiLOT media">
               <button
@@ -133,11 +90,8 @@
                 Play now
               </button>
             </div>
-            <a
-              class="game-stage__external"
-              href="tanks-ailot/"
-            >
-              Open dedicated page
+            <a class="game-stage__external" href="tanks-ailot/">
+              Tanks AiLOT · full page
             </a>
           </div>
 
@@ -161,102 +115,63 @@
               <p>Deploying tanks…</p>
               <p class="game-stage__fallback" id="game-fallback" hidden>
                 Taking too long?
-                <a
-                  href="tanks-ailot/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  Open Tanks AiLOT on its own page
-                </a>
+                <a href="tanks-ailot/">Open Tanks AiLOT on its own page</a>
               </p>
             </div>
           </div>
         </div>
       </section>
 
-      <section class="projects section" id="projects" aria-labelledby="projects-title">
+      <section class="section" id="log" aria-labelledby="log-title">
         <div class="section-heading">
-          <p class="section-kicker">02 · Selected work</p>
-          <h2 id="projects-title">Selected AI projects</h2>
-          <p>
-            High-level notes on active work, kept intentionally concise until
-            each project is ready for a deeper public write-up.
-          </p>
-        </div>
-
-        <div class="project-grid" id="project-grid"></div>
-      </section>
-
-      <section class="build-log section" id="log" aria-labelledby="log-title">
-        <div class="section-heading">
-          <p class="section-kicker">03 · Receipts</p>
           <h2 id="log-title">Build log</h2>
           <p>
             Figuring it out in public means showing the work, not just the
-            launches. Dated entries: what was tried, what broke, what stuck.
+            launches. Each entry: what was tried, what broke, what stuck.
           </p>
         </div>
 
-        <ol class="build-log__feed" id="build-log-feed"></ol>
+        <ol class="log-feed" id="build-log-feed"></ol>
       </section>
 
-      <section class="about section" id="about" aria-labelledby="about-title">
-        <figure class="bio-media">
-          <button
-            class="bio-media__stack"
-            type="button"
-            aria-label="Portrait of Greg Kitchen. Activate to reveal the AI double."
-          >
-            <img
-              class="bio-media__portrait"
-              src="assets/greg-kitchen-bio.webp"
-              alt="Portrait of Greg Kitchen"
-              width="242"
-              height="358"
-            />
-            <img
-              class="bio-media__ai"
-              src="assets/greg-kitchen-ai-humanoid.webp"
-              alt=""
-              width="484"
-              height="716"
-              aria-hidden="true"
-            />
-          </button>
-          <figcaption class="bio-media__hint">
-            Hover — every builder has an AI double now.
-          </figcaption>
-        </figure>
+      <section class="section" id="projects" aria-labelledby="projects-title">
+        <div class="section-heading">
+          <h2 id="projects-title">Projects</h2>
+          <p>Two you can use today. Two still on the bench.</p>
+        </div>
 
-        <div class="bio-copy">
-          <p class="section-kicker">04 · About</p>
+        <ol class="project-list" id="project-list"></ol>
+
+        <h3 class="project-list__label">Not public yet</h3>
+        <ol class="project-list project-list--upcoming" id="project-list-upcoming"></ol>
+      </section>
+
+      <section class="section about" id="about" aria-labelledby="about-title">
+        <img
+          class="about__portrait"
+          src="assets/greg-kitchen-bio.webp"
+          alt="Portrait of Greg Kitchen"
+          width="242"
+          height="358"
+          loading="lazy"
+        />
+
+        <div class="about__copy">
           <h2 id="about-title">About Greg</h2>
           <p>
-            Greg Kitchen builds practical AI systems that make complex signals
-            easier to understand and act on. His work sits at the intersection
-            of strategy, market sensing, product thinking, and rapid
-            prototyping.
+            Greg Kitchen works where strategy, market sensing, and product
+            thinking meet, and builds small AI systems to learn how they behave
+            before trusting them with consequential decisions.
           </p>
           <p>
-            The through line is translation: turning ambiguity into structure,
-            structure into tools, and tools into clearer decisions for people
-            doing consequential work.
+            Everything on this site was built while learning: the game, the
+            course, the site itself. The log is the honest version of the
+            story.
           </p>
-
-          <dl class="bio-principles" aria-label="Working principles">
-            <div>
-              <dt>Clear signal</dt>
-              <dd>Find what matters without adding noise.</dd>
-            </div>
-            <div>
-              <dt>Human judgment</dt>
-              <dd>Use AI to sharpen decisions, not replace context.</dd>
-            </div>
-            <div>
-              <dt>Useful loops</dt>
-              <dd>Favor systems that can be tested, improved, and reused.</dd>
-            </div>
-          </dl>
+          <p>
+            Working on something similar, or want to compare notes?
+            <a href="contact.html">Get in touch</a>.
+          </p>
         </div>
       </section>
     </main>
@@ -264,14 +179,14 @@
     <footer class="site-footer">
       <div class="site-footer__inner">
         <p>
-          A living index for AI work in progress. More projects will be added
-          as they become ready to share.
+          A public lab notebook. New entries land in the log as the work
+          happens.
           <span class="site-footer__copyright">© 2026 Greg Kitchen</span>
         </p>
         <nav class="site-footer__nav" aria-label="Footer navigation">
-          <a href="tanks-ailot/">Tanks</a>
+          <a href="tanks-ailot/">Play</a>
+          <a href="#log">Log</a>
           <a href="#projects">Projects</a>
-          <a href="#log">Build log</a>
           <a href="#about">About</a>
           <a href="contact.html">Contact</a>
           <a href="mailto:gregthedinosaur@gmail.com">gregthedinosaur@gmail.com</a>
