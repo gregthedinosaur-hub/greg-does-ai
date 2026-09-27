@@ -87,6 +87,8 @@ test("projects render as a list, split into shipped and not-public-yet", async (
   // Only shipped work carries a url and a thumbnail.
   assert.match(script, /url: "ai-mini-mba-interactive-course\.html"/);
   assert.match(script, /url: "tanks-ailot\/"/);
+  assert.match(script, /url: "signalscouts\/"/);
+  assert.match(script, /signalscouts\/art\/porchlight\.webp/);
   assert.match(script, /assets\/project-ai-mini-mba\.webp/);
   assert.match(script, /assets\/project-tanks-ailot\.webp/);
   assert.doesNotMatch(script, /project-signal-scouts|project-meridian-studio/);

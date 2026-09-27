@@ -18,9 +18,11 @@ const projects = [
   },
   {
     name: "Signal Scouts",
-    status: "Prototype",
+    status: "Live game",
+    image: "signalscouts/art/porchlight.webp",
+    url: "signalscouts/",
     summary:
-      "A market-sensing workflow for turning scattered observations into an actionable watchlist.",
+      "A spooky tower-defense adventure with 15 cases, an expanding crew, signal-chain tactics, and a final boss.",
   },
   {
     name: "Meridian Studio",
