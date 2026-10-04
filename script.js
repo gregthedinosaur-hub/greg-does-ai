@@ -43,6 +43,13 @@ const projects = [
 // Newest first. The top entry also feeds the "Now" line in the hero.
 const buildLog = [
   {
+    date: "2026-10-04",
+    title: "Shipped Marisa II",
+    tried: "A straight-faced Zelda II across San Antonio: six Fiesta medals, eight spells, all of it 16-bit and synthesized in the browser.",
+    broke: "A boss nobody could hit: the Silverfish lay stunned 250 pixels away and woke before you could walk over. My tests swore it worked.",
+    stuck: "Bots that play the real game: one reads the tells, one button-mashes. Reading should win, mashing should lose.",
+  },
+  {
     date: "2026-06-11",
     title: "Site redesign + playable Tanks embed",
     tried: "Rebuilt the site around the game: dark telemetry theme, card grid, trailer/play toggle.",
