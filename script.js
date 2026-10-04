@@ -25,6 +25,14 @@ const projects = [
       "A spooky tower-defense adventure with 15 cases, an expanding crew, signal-chain tactics, and a final boss.",
   },
   {
+    name: "Marisa II",
+    status: "Live game",
+    image: "assets/project-marisa-ii.webp",
+    url: "marisaii/",
+    summary:
+      "A 16-bit Zelda II-style action RPG across San Antonio: six Fiesta medals, eight spells, and the Cedar King under the Alamo.",
+  },
+  {
     name: "Meridian Studio",
     status: "In development",
     summary:
