@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<base href="/marisaii/">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<title>Marisa II — The Adventure of Greg</title>
+<meta name="description" content="A 16-bit Zelda II-style action RPG across San Antonio: six Fiesta medals, eight spells, and the Cedar King under the Alamo. Free in your browser.">
+<meta name="theme-color" content="#07070d">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Marisa II — The Adventure of Greg">
+<meta property="og:description" content="Cedar fever put Marisa to sleep. Cross San Antonio with one hickory drumstick. A free 16-bit action RPG.">
+<meta property="og:url" content="https://gregdoesai.com/marisaii/">
+<style>
+  html,body{margin:0;height:100%;background:#07070d;display:flex;align-items:center;justify-content:center;overflow:hidden}
+  canvas{image-rendering:pixelated;image-rendering:crisp-edges;box-shadow:0 0 60px #000}
+  /* touch controls: only shown on touch screens (game.js unhides them) */
+  body{touch-action:none;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+  [hidden]{display:none!important}
+  #touch{position:fixed;inset:0;pointer-events:none;font:bold 13px/1 monospace;color:#fce0a8}
+  #touch>*{pointer-events:auto;position:absolute}
+  #pad{left:max(18px,env(safe-area-inset-left));bottom:max(18px,env(safe-area-inset-bottom));width:132px;height:132px;border-radius:50%;
+       background:radial-gradient(circle,#0000 28%,#fce0a81a 29%,#fce0a826 70%);border:2px solid #fce0a855}
+  #pad i{position:absolute;width:0;height:0;border:9px solid transparent;opacity:.6}
+  #pad .u{left:57px;top:8px;border-bottom-color:#fce0a8}#pad .d{left:57px;bottom:8px;border-top-color:#fce0a8}
+  #pad .l{top:57px;left:8px;border-right-color:#fce0a8}#pad .r{top:57px;right:8px;border-left-color:#fce0a8}
+  .tb{width:66px;height:66px;border-radius:50%;border:2px solid #fce0a877;background:#fce0a81f;color:#fce0a8;font:bold 22px monospace}
+  .tb.on,.ts.on{background:#fce0a866}
+  #tA{right:max(18px,env(safe-area-inset-right));bottom:max(64px,calc(env(safe-area-inset-bottom) + 46px))}
+  #tB{right:calc(max(18px,env(safe-area-inset-right)) + 80px);bottom:max(22px,env(safe-area-inset-bottom))}
+  #trow{left:50%;transform:translateX(-50%);bottom:max(10px,env(safe-area-inset-bottom));display:flex;gap:8px}
+  @media (orientation:portrait){#trow{bottom:auto;top:max(14px,env(safe-area-inset-top))}}   /* the menu keys go up where there is room */
+  .ts{padding:8px 10px;border-radius:14px;border:2px solid #fce0a855;background:#fce0a814;color:#fce0a8;font:bold 12px monospace}
+</style>
+</head>
+<body>
+<canvas id="c" width="384" height="216"></canvas>
+<div id="touch" hidden>
+  <div id="pad"><i class="u"></i><i class="d"></i><i class="l"></i><i class="r"></i></div>
+  <button class="tb" id="tB" data-k="atk">B</button>
+  <button class="tb" id="tA" data-k="jump">A</button>
+  <div id="trow"><button class="ts" data-k="cycle">SPELL</button><button class="ts" data-k="cast">CAST</button><button class="ts" data-k="use">TALK</button><button class="ts" data-k="pause">II</button></div>
+</div>
+<script src="/marisaii/art/atlas.js"></script>
+<script src="/marisaii/game.js"></script>
+</body>
+</html>
