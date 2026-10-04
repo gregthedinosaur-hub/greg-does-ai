@@ -5579,7 +5579,7 @@ requestAnimationFrame(frame);
     console.assert(s.tiles.every(r => r.length === w), name + ' width uniform');
     (s.spawns || []).forEach(sp => {
       console.assert(sp[1] < w && sp[2] < ROWS, name + ' spawn in bounds');
-      console.assert(['ant', 'grackle', 'wisp', 'cone', 'cartknight', 'tourist'].includes(sp[0]), name + ' knows enemy ' + sp[0]);
+      console.assert(['ant', 'grackle', 'bat', 'wisp', 'cone', 'cartknight', 'tourist'].includes(sp[0]), name + ' knows enemy ' + sp[0]);
     });
     Object.keys(s.doors || {}).forEach(col => {
       const c = +col;
