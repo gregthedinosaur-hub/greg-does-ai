@@ -14,6 +14,7 @@ test("home page lists every project and keeps the section anchors", async () => 
   for (const project of [
     "AI Mini-MBA",
     "Marisa II",
+    "MarsCraft",
     "Meridian Studio",
     "Signal Scouts",
     "Tanks AiLOT",
@@ -240,6 +241,7 @@ test("optimized webp assets exist and are small", async () => {
     "project-ai-mini-mba",
     "project-tanks-ailot",
     "project-marisa-ii",
+    "project-marscraft",
     "greg-kitchen-bio",
   ]) {
     const file = await stat(new URL(`../assets/${name}.webp`, import.meta.url));

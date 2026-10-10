@@ -33,6 +33,14 @@ const projects = [
       "A 16-bit Zelda II-style action RPG across San Antonio: six Fiesta medals, eight spells, and the Cedar King under the Alamo.",
   },
   {
+    name: "MarsCraft",
+    status: "Live game",
+    image: "assets/project-marscraft.webp",
+    url: "Marscraft/",
+    summary:
+      "A StarCraft-style RTS on Mars: mine ferrite, wire your bases, cut the Hush's veins, and dissect what you kill to build hybrid soldiers. Five missions, three endings.",
+  },
+  {
     name: "Meridian Studio",
     status: "In development",
     summary:
@@ -42,6 +50,13 @@ const projects = [
 
 // Newest first. The top entry also feeds the "Now" line in the hero.
 const buildLog = [
+  {
+    date: "2026-10-10",
+    title: "Shipped MarsCraft: The Hush Below",
+    tried: "Turned a one-screen power-raid prototype into a five-mission StarCraft-style campaign, with every sprite and painting made in OpenAI image gen from reference images.",
+    broke: "Four missions in a row could be won by rushing before the first wave. Bots found it every time; the fixes were vein locks, not bigger numbers.",
+    stuck: "Headless bots that play each mission three ways: rush, turtle, do nothing. If the rush wins, the mission isn't done.",
+  },
   {
     date: "2026-10-04",
     title: "Shipped Marisa II",
