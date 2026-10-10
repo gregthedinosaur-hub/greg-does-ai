@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MarsCraft - The Hush Below</title>
+    <link rel="icon" href="data:," />
+    <script>
+      if (window.location.protocol === 'file:') {
+        window.location.replace('http://127.0.0.1:5174/');
+      }
+    </script>
+    <link rel="stylesheet" href="src/styles.css?v=marscraft-online-1" />
+    <script type="importmap">
+      {
+        "imports": {
+          "phaser": "./vendor/phaser.esm.js"
+        }
+      }
+    </script>
+  </head>
+  <body>
+    <div id="app"></div>
+    <script type="module" src="build-app/main.js?v=marscraft-online-1"></script>
+  </body>
+</html>
